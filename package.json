@@ -93,28 +93,28 @@
         "type": "string",
         "description": "Base URL for AI Gateway (Vercel, OpenRouter, etc)",
         "required": false,
-        "default": "https://ai-gateway.vercel.sh/v1/ai",
+        "default": "https://gateway.vercel.sh/v1",
         "sensitive": false
       },
       "AIGATEWAY_DEFAULT_MODEL": {
         "type": "string",
         "description": "Default model to use",
         "required": false,
-        "default": "openai/gpt-4o-mini",
+        "default": "openai:gpt-4o-mini",
         "sensitive": false
       },
       "AIGATEWAY_LARGE_MODEL": {
         "type": "string",
         "description": "Large model to use",
         "required": false,
-        "default": "openai/gpt-4o",
+        "default": "openai:gpt-4o",
         "sensitive": false
       },
       "AIGATEWAY_EMBEDDING_MODEL": {
         "type": "string",
         "description": "Embedding model to use",
         "required": false,
-        "default": "openai/text-embedding-3-small",
+        "default": "openai:text-embedding-3-small",
         "sensitive": false
       },
       "AIGATEWAY_CACHE_TTL": {

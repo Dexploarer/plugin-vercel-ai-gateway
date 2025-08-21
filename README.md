@@ -1,6 +1,6 @@
 # AI Gateway Plugin for elizaOS
 
-Access 100+ AI models through unified AI gateways with automatic failover, caching, and centralized billing. Compatible with Vercel AI Gateway, OpenRouter, and other OpenAI-compatible endpoints.
+Access 100+ AI models through Vercel AI Gateway and other unified gateways with automatic failover, caching, and centralized billing. Optimized for Vercel AI Gateway with full support for OpenRouter and other OpenAI-compatible endpoints.
 
 ## Features
 
@@ -20,26 +20,34 @@ npm install @elizaos-plugins/plugin-aigateway
 
 ## Quick Start
 
-### 1. Set Environment Variables
+### 1. Get Your API Key
+
+For **Vercel AI Gateway**:
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Navigate to the AI Gateway tab
+3. Click "API keys" → "Create key"
+4. Copy your new API key
+
+### 2. Set Environment Variables
 
 ```env
-# Required: API Key for your gateway
-AIGATEWAY_API_KEY=your_api_key_here
+# Required: Your Vercel AI Gateway API key
+AIGATEWAY_API_KEY=your_vercel_api_key_here
 
 # Optional: Customize gateway URL (defaults to Vercel)
-AIGATEWAY_BASE_URL=https://ai-gateway.vercel.sh/v1/ai
+AIGATEWAY_BASE_URL=https://gateway.vercel.sh/v1
 
-# Optional: Model configuration
-AIGATEWAY_DEFAULT_MODEL=openai/gpt-4o-mini
-AIGATEWAY_LARGE_MODEL=openai/gpt-4o
-AIGATEWAY_EMBEDDING_MODEL=openai/text-embedding-3-small
+# Optional: Model configuration (use colon format for Vercel)
+AIGATEWAY_DEFAULT_MODEL=openai:gpt-4o-mini
+AIGATEWAY_LARGE_MODEL=openai:gpt-4o
+AIGATEWAY_EMBEDDING_MODEL=openai:text-embedding-3-small
 
 # Optional: Performance settings
 AIGATEWAY_CACHE_TTL=300
 AIGATEWAY_MAX_RETRIES=3
 ```
 
-### 2. Add to Your Character
+### 3. Add to Your Character
 
 ```json
 {
@@ -51,7 +59,7 @@ AIGATEWAY_MAX_RETRIES=3
 }
 ```
 
-### 3. Run Your Agent
+### 4. Run Your Agent
 
 ```bash
 npm run start -- --character path/to/character.json
@@ -59,59 +67,73 @@ npm run start -- --character path/to/character.json
 
 ## Supported Gateways
 
-### Vercel AI Gateway (Default)
+### Vercel AI Gateway (Default) ✅
 ```env
-AIGATEWAY_BASE_URL=https://ai-gateway.vercel.sh/v1/ai
+AIGATEWAY_BASE_URL=https://gateway.vercel.sh/v1
+AIGATEWAY_API_KEY=your_vercel_api_key
 ```
+
+**Key Features with Vercel:**
+- 100+ models through a single endpoint
+- Automatic fallbacks and retries
+- Built-in monitoring and analytics
+- App attribution tracking
+- Budget controls and spending limits
+
+**Model Format:** Use colon separator (e.g., `openai:gpt-4o`, `anthropic:claude-3-5-sonnet`)
 
 ### OpenRouter
 ```env
 AIGATEWAY_BASE_URL=https://openrouter.ai/api/v1
+AIGATEWAY_API_KEY=your_openrouter_api_key
 ```
+**Model Format:** Use slash separator (e.g., `openai/gpt-4o`, `anthropic/claude-3-5-sonnet`)
 
 ### Custom Gateway
 Any OpenAI-compatible endpoint:
 ```env
 AIGATEWAY_BASE_URL=https://your-gateway.com/v1
+AIGATEWAY_API_KEY=your_gateway_api_key
 ```
 
 ## Available Models
 
 ### OpenAI
-- `openai/gpt-4o`, `openai/gpt-4o-mini`
-- `openai/gpt-3.5-turbo`
-- `openai/dall-e-3` (images)
-- `openai/text-embedding-3-small`, `openai/text-embedding-3-large`
+- `openai:gpt-4o`, `openai:gpt-4o-mini`
+- `openai:gpt-3.5-turbo`
+- `openai:dall-e-3` (images)
+- `openai:text-embedding-3-small`, `openai:text-embedding-3-large`
 
 ### Anthropic
-- `anthropic/claude-3-5-sonnet`
-- `anthropic/claude-3-opus`
-- `anthropic/claude-3-haiku`
+- `anthropic:claude-3-5-sonnet`
+- `anthropic:claude-3-opus`
+- `anthropic:claude-3-haiku`
 
 ### Google
-- `google/gemini-2.0-flash`
-- `google/gemini-1.5-pro`
-- `google/gemini-1.5-flash`
+- `google:gemini-2.0-flash`
+- `google:gemini-1.5-pro`
+- `google:gemini-1.5-flash`
 
 ### Meta
-- `meta/llama-3.1-405b`
-- `meta/llama-3.1-70b`
-- `meta/llama-3.1-8b`
+- `meta:llama-3.1-405b`
+- `meta:llama-3.1-70b`
+- `meta:llama-3.1-8b`
 
 ### Mistral
-- `mistral/mistral-large`
-- `mistral/mistral-medium`
-- `mistral/mistral-small`
+- `mistral:mistral-large`
+- `mistral:mistral-medium`
+- `mistral:mistral-small`
+
 
 ## Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `AIGATEWAY_API_KEY` | - | Your gateway API key |
-| `AIGATEWAY_BASE_URL` | `https://ai-gateway.vercel.sh/v1/ai` | Gateway endpoint URL |
-| `AIGATEWAY_DEFAULT_MODEL` | `openai/gpt-4o-mini` | Default small model |
-| `AIGATEWAY_LARGE_MODEL` | `openai/gpt-4o` | Default large model |
-| `AIGATEWAY_EMBEDDING_MODEL` | `openai/text-embedding-3-small` | Embedding model |
+| `AIGATEWAY_API_KEY` | - | Your gateway API key (required) |
+| `AIGATEWAY_BASE_URL` | `https://gateway.vercel.sh/v1` | Gateway endpoint URL |
+| `AIGATEWAY_DEFAULT_MODEL` | `openai:gpt-4o-mini` | Default small model (Vercel format) |
+| `AIGATEWAY_LARGE_MODEL` | `openai:gpt-4o` | Default large model (Vercel format) |
+| `AIGATEWAY_EMBEDDING_MODEL` | `openai:text-embedding-3-small` | Embedding model (Vercel format) |
 | `AIGATEWAY_CACHE_TTL` | `300` | Cache TTL in seconds |
 | `AIGATEWAY_MAX_RETRIES` | `3` | Max retry attempts |
 | `AIGATEWAY_USE_OIDC` | `false` | Enable OIDC authentication |
@@ -185,8 +207,8 @@ const character = {
     name: 'MyAgent',
     plugins: [aiGatewayPlugin],
     settings: {
-        AIGATEWAY_API_KEY: 'your-key',
-        AIGATEWAY_DEFAULT_MODEL: 'openai/gpt-4o-mini'
+        AIGATEWAY_API_KEY: 'your-vercel-api-key',
+        AIGATEWAY_DEFAULT_MODEL: 'openai:gpt-4o-mini'
     }
 };
 ```
@@ -200,7 +222,7 @@ const character = {
     settings: {
         AIGATEWAY_API_KEY: 'your-openrouter-key',
         AIGATEWAY_BASE_URL: 'https://openrouter.ai/api/v1',
-        AIGATEWAY_DEFAULT_MODEL: 'anthropic/claude-3-haiku',
+        AIGATEWAY_DEFAULT_MODEL: 'anthropic/claude-3-haiku',  // Use slash for OpenRouter
         AIGATEWAY_LARGE_MODEL: 'anthropic/claude-3-5-sonnet'
     }
 };

@@ -16,43 +16,43 @@ interface ModelInfo {
 const AVAILABLE_MODELS: ModelInfo[] = [
   // OpenAI
   {
-    id: "openai/gpt-4o",
+    id: "openai:gpt-4o",
     provider: "OpenAI",
     type: "text",
     description: "Most capable GPT-4 model",
   },
   {
-    id: "openai/gpt-4o-mini",
+    id: "openai:gpt-4o-mini",
     provider: "OpenAI",
     type: "text",
     description: "Fast and affordable GPT-4",
   },
   {
-    id: "openai/gpt-3.5-turbo",
+    id: "openai:gpt-3.5-turbo",
     provider: "OpenAI",
     type: "text",
     description: "Fast and efficient",
   },
   {
-    id: "openai/dall-e-3",
+    id: "openai:dall-e-3",
     provider: "OpenAI",
     type: "image",
     description: "Advanced image generation",
   },
   {
-    id: "openai/text-embedding-3-small",
+    id: "openai:text-embedding-3-small",
     provider: "OpenAI",
     type: "embedding",
     description: "Small embedding model",
   },
   {
-    id: "openai/text-embedding-3-large",
+    id: "openai:text-embedding-3-large",
     provider: "OpenAI",
     type: "embedding",
     description: "Large embedding model",
   },
   {
-    id: "openai/whisper-1",
+    id: "openai:whisper-1",
     provider: "OpenAI",
     type: "audio",
     description: "Speech to text",
@@ -60,19 +60,19 @@ const AVAILABLE_MODELS: ModelInfo[] = [
 
   // Anthropic
   {
-    id: "anthropic/claude-3-5-sonnet",
+    id: "anthropic:claude-3-5-sonnet",
     provider: "Anthropic",
     type: "text",
     description: "Claude 3.5 Sonnet",
   },
   {
-    id: "anthropic/claude-3-opus",
+    id: "anthropic:claude-3-opus",
     provider: "Anthropic",
     type: "text",
     description: "Most capable Claude",
   },
   {
-    id: "anthropic/claude-3-haiku",
+    id: "anthropic:claude-3-haiku",
     provider: "Anthropic",
     type: "text",
     description: "Fast Claude model",
@@ -80,19 +80,19 @@ const AVAILABLE_MODELS: ModelInfo[] = [
 
   // Google
   {
-    id: "google/gemini-2.0-flash",
+    id: "google:gemini-2.0-flash",
     provider: "Google",
     type: "text",
     description: "Gemini 2.0 Flash",
   },
   {
-    id: "google/gemini-1.5-pro",
+    id: "google:gemini-1.5-pro",
     provider: "Google",
     type: "text",
     description: "Gemini Pro",
   },
   {
-    id: "google/gemini-1.5-flash",
+    id: "google:gemini-1.5-flash",
     provider: "Google",
     type: "text",
     description: "Fast Gemini model",
@@ -100,19 +100,19 @@ const AVAILABLE_MODELS: ModelInfo[] = [
 
   // Meta
   {
-    id: "meta/llama-3.1-405b",
+    id: "meta:llama-3.1-405b",
     provider: "Meta",
     type: "text",
     description: "Largest Llama model",
   },
   {
-    id: "meta/llama-3.1-70b",
+    id: "meta:llama-3.1-70b",
     provider: "Meta",
     type: "text",
     description: "Large Llama model",
   },
   {
-    id: "meta/llama-3.1-8b",
+    id: "meta:llama-3.1-8b",
     provider: "Meta",
     type: "text",
     description: "Small Llama model",
@@ -120,19 +120,19 @@ const AVAILABLE_MODELS: ModelInfo[] = [
 
   // Mistral
   {
-    id: "mistral/mistral-large",
+    id: "mistral:mistral-large",
     provider: "Mistral",
     type: "text",
     description: "Large Mistral model",
   },
   {
-    id: "mistral/mistral-medium",
+    id: "mistral:mistral-medium",
     provider: "Mistral",
     type: "text",
     description: "Medium Mistral model",
   },
   {
-    id: "mistral/mistral-small",
+    id: "mistral:mistral-small",
     provider: "Mistral",
     type: "text",
     description: "Small Mistral model",

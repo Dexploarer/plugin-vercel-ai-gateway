@@ -27,15 +27,27 @@ import {
   getEmbeddingModel,
   getMaxRetries,
   getCacheTTL,
+  getAppName,
 } from "../utils/config";
 
 /**
  * Create AI Gateway client
  */
 function createGatewayClient(runtime: IAgentRuntime) {
+  const apiKey = getApiKey(runtime);
+  if (!apiKey) {
+    throw new Error("AI Gateway API key not configured");
+  }
+
+  const appName = getAppName(runtime);
+
   return createOpenAI({
-    apiKey: getApiKey(runtime),
-    baseURL: getBaseURL(runtime),
+    apiKey: apiKey,
+    baseURL: `${getBaseURL(runtime)}/openai`,
+    headers: {
+      "x-api-key": apiKey,
+      "x-vercel-app": appName,
+    },
   });
 }
 
@@ -229,14 +241,15 @@ export class GatewayProvider {
     }
 
     try {
-      const response = await fetch(`${baseURL}/embeddings`, {
+      const response = await fetch(`${baseURL}/openai/embeddings`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          "x-api-key": apiKey,
           "Content-Type": "application/json",
+          "x-vercel-app": getAppName(this.runtime),
         },
         body: JSON.stringify({
-          model: embeddingModel,
+          model: embeddingModel.replace(":", "/"),
           input: text,
         }),
       });
@@ -299,7 +312,7 @@ export class GatewayProvider {
     const n = params.n || 1;
     const size = params.size || "1024x1024";
     const prompt = params.prompt;
-    const modelName = "openai/dall-e-3";
+    const modelName = "openai:dall-e-3";
 
     logger.log(`[AIGateway] Using IMAGE model: ${modelName}`);
 
@@ -311,14 +324,15 @@ export class GatewayProvider {
     }
 
     try {
-      const response = await fetch(`${baseURL}/images/generations`, {
+      const response = await fetch(`${baseURL}/openai/images/generations`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          "x-api-key": apiKey,
           "Content-Type": "application/json",
+          "x-vercel-app": getAppName(this.runtime),
         },
         body: JSON.stringify({
-          model: modelName,
+          model: modelName.replace(":", "/"),
           prompt: prompt,
           n: n,
           size: size,

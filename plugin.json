@@ -64,13 +64,13 @@
         "key": "AIGATEWAY_BASE_URL",
         "type": "string",
         "description": "Gateway base URL",
-        "default": "https://ai-gateway.vercel.sh/v1/ai"
+        "default": "https://gateway.vercel.sh/v1"
       },
       {
         "key": "AIGATEWAY_DEFAULT_MODEL",
         "type": "string",
         "description": "Default model for text generation",
-        "default": "openai/gpt-4o-mini"
+        "default": "openai:gpt-4o-mini"
       }
     ]
   },

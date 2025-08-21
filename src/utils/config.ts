@@ -18,7 +18,7 @@ export function getBaseURL(runtime: IAgentRuntime): string {
   const baseURL = getSetting(
     runtime,
     "AIGATEWAY_BASE_URL",
-    "https://ai-gateway.vercel.sh/v1/ai",
+    "https://gateway.vercel.sh/v1",
   ) as string;
 
   return baseURL;
@@ -38,7 +38,7 @@ export function getSmallModel(runtime: IAgentRuntime): string {
   return getSetting(
     runtime,
     "AIGATEWAY_DEFAULT_MODEL",
-    "openai/gpt-4o-mini",
+    "openai:gpt-4o-mini",
   ) as string;
 }
 
@@ -49,7 +49,7 @@ export function getLargeModel(runtime: IAgentRuntime): string {
   return getSetting(
     runtime,
     "AIGATEWAY_LARGE_MODEL",
-    "openai/gpt-4o",
+    "openai:gpt-4o",
   ) as string;
 }
 
@@ -60,7 +60,7 @@ export function getEmbeddingModel(runtime: IAgentRuntime): string {
   return getSetting(
     runtime,
     "AIGATEWAY_EMBEDDING_MODEL",
-    "openai/text-embedding-3-small",
+    "openai:text-embedding-3-small",
   ) as string;
 }
 
@@ -88,6 +88,17 @@ export function useOIDC(runtime: IAgentRuntime): boolean {
 }
 
 /**
+ * Get app name for Vercel attribution
+ */
+export function getAppName(runtime: IAgentRuntime): string {
+  return getSetting(
+    runtime,
+    "AIGATEWAY_APP_NAME",
+    "elizaos-aigateway",
+  ) as string;
+}
+
+/**
  * Configuration interface for the plugin
  */
 export interface AIGatewayConfig {
@@ -99,6 +110,7 @@ export interface AIGatewayConfig {
   cacheTTL: number;
   maxRetries: number;
   useOIDC: boolean;
+  appName: string;
 }
 
 /**
@@ -114,5 +126,6 @@ export function getConfig(runtime: IAgentRuntime): AIGatewayConfig {
     cacheTTL: getCacheTTL(runtime),
     maxRetries: getMaxRetries(runtime),
     useOIDC: useOIDC(runtime),
+    appName: getAppName(runtime),
   };
 }
