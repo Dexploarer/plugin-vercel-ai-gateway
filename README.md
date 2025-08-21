@@ -14,8 +14,20 @@ Access 100+ AI models through Vercel AI Gateway and other unified gateways with 
 
 ## Installation
 
+### NPM Package (Available Now)
 ```bash
-npm install @elizaos-plugins/plugin-aigateway
+# Install from npm registry
+npm install @promptordie/plugin-aigateway
+
+# Or using bun
+bun add @promptordie/plugin-aigateway
+```
+
+### Official ElizaOS Registry (Coming Soon)
+Once merged into the official ElizaOS ecosystem:
+```bash
+# Will be available as
+npm install @elizaos/plugin-aigateway
 ```
 
 ## Quick Start
@@ -52,7 +64,18 @@ AIGATEWAY_MAX_RETRIES=3
 ```json
 {
   "name": "MyAgent",
-  "plugins": ["@elizaos-plugins/plugin-aigateway"],
+  "plugins": ["@promptordie/plugin-aigateway"],
+  "settings": {
+    "AIGATEWAY_API_KEY": "your_api_key_here"
+  }
+}
+```
+
+Or if using the official ElizaOS version (once available):
+```json
+{
+  "name": "MyAgent",
+  "plugins": ["@elizaos/plugin-aigateway"],
   "settings": {
     "AIGATEWAY_API_KEY": "your_api_key_here"
   }
@@ -201,7 +224,11 @@ List available models from the gateway.
 ### Basic Usage
 
 ```typescript
-import aiGatewayPlugin from '@elizaos-plugins/plugin-aigateway';
+// Using npm package (available now)
+import aiGatewayPlugin from '@promptordie/plugin-aigateway';
+
+// Or when using official ElizaOS version (once available)
+// import aiGatewayPlugin from '@elizaos/plugin-aigateway';
 
 const character = {
     name: 'MyAgent',
@@ -256,8 +283,11 @@ const images = await runtime.useModel(ModelType.IMAGE, {
 # Run plugin tests
 npm test
 
-# Test with elizaOS CLI
-elizaos test --plugin aigateway
+# Test with elizaOS CLI (using npm package)
+elizaos test --plugin @promptordie/plugin-aigateway
+
+# Or with official package (once available)
+# elizaos test --plugin @elizaos/plugin-aigateway
 ```
 
 ## Development
