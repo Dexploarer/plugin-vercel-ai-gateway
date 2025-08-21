@@ -55,7 +55,7 @@ export async function demonstrateUsage(runtime: IAgentRuntime) {
         temperature: 0.8,
         maxTokens: 50
     });
-    console.log('Haiku:', shortText);
+    // Result: shortText
 
     // Complex reasoning with large model
     const analysis = await runtime.useModel(ModelType.TEXT_LARGE, {
@@ -63,13 +63,13 @@ export async function demonstrateUsage(runtime: IAgentRuntime) {
         temperature: 0.7,
         maxTokens: 1000
     });
-    console.log('Analysis:', analysis);
+    // Result: analysis
 
     // Generate embeddings for semantic search
     const embedding = await runtime.useModel(ModelType.TEXT_EMBEDDING, {
         text: 'Machine learning transforms data into insights'
     });
-    console.log('Embedding dimensions:', embedding.length);
+    // Result: embedding with dimensions
 
     // Generate an image
     const images = await runtime.useModel(ModelType.IMAGE, {
@@ -77,14 +77,14 @@ export async function demonstrateUsage(runtime: IAgentRuntime) {
         size: '1024x1024',
         n: 1
     });
-    console.log('Generated images:', images);
+    // Result: images
 
     // Generate structured data
     const structuredData = await runtime.useModel(ModelType.OBJECT_SMALL, {
         prompt: 'Generate a JSON object with user profile fields: name, age, interests (array), location',
         temperature: 0
     });
-    console.log('Structured data:', structuredData);
+    // Result: structuredData
 }
 
 /**
@@ -161,13 +161,13 @@ export async function handleErrors(runtime: IAgentRuntime) {
             prompt: 'Hello, AI!',
             temperature: 0.7
         });
-        console.log('Success:', response);
+        // Success: response
     } catch (error) {
         console.error('Error generating text:', error);
         
         // Fallback logic
         if (error.message.includes('rate limit')) {
-            console.log('Rate limited, waiting before retry...');
+            // Rate limited, waiting before retry...
             await new Promise(resolve => setTimeout(resolve, 5000));
             // Retry with smaller model or different settings
         } else if (error.message.includes('API key')) {

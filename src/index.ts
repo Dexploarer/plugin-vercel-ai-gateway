@@ -81,7 +81,10 @@ export const aiGatewayPlugin: Plugin = {
   /**
    * Initialize the plugin
    */
-  async init(config: Record<string, string>, runtime: IAgentRuntime): Promise<void> {
+  async init(
+    config: Record<string, string>,
+    runtime: IAgentRuntime,
+  ): Promise<void> {
     logger.log("[AIGateway] Initializing plugin...");
 
     // Validate API key or OIDC configuration
