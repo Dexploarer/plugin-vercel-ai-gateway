@@ -1,0 +1,37 @@
+# Source files
+src/
+*.ts
+!*.d.ts
+
+# Config files
+tsconfig.json
+tsup.config.ts
+vitest.config.ts
+.gitignore
+.npmignore
+
+# Development files
+node_modules/
+.env
+.env.*
+*.log
+coverage/
+.turbo/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Build artifacts (except dist)
+*.tsbuildinfo
+
+# Documentation source (keep README.md)
+docs/
+
+# Tests
+tests/
+*.test.ts
+*.spec.ts
