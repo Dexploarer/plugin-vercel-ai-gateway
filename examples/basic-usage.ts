@@ -38,7 +38,7 @@ export const vercelGatewayCharacter = {
     plugins: [aiGatewayPlugin],
     settings: {
         AIGATEWAY_API_KEY: process.env.VERCEL_API_KEY,
-        AIGATEWAY_BASE_URL: 'https://gateway.vercel.sh/v1',
+        AIGATEWAY_BASE_URL: 'https://ai-gateway.vercel.sh/v1',
         AIGATEWAY_DEFAULT_MODEL: 'openai:gpt-4o-mini', // Colon format for Vercel
         AIGATEWAY_LARGE_MODEL: 'openai:gpt-4o',
         AIGATEWAY_EMBEDDING_MODEL: 'openai:text-embedding-3-large',
@@ -141,7 +141,7 @@ export const multiProviderCharacter = {
     settings: {
         // Primary gateway (Vercel)
         AIGATEWAY_API_KEY: process.env.VERCEL_API_KEY,
-        AIGATEWAY_BASE_URL: 'https://gateway.vercel.sh/v1',
+        AIGATEWAY_BASE_URL: 'https://ai-gateway.vercel.sh/v1',
         
         // Use different models from different providers (colon format for Vercel)
         AIGATEWAY_DEFAULT_MODEL: 'anthropic:claude-3-haiku', // Fast responses

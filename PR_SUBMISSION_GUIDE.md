@@ -89,7 +89,7 @@ Universal AI Gateway integration for accessing 100+ AI models through Vercel, Op
   "plugins": ["@elizaos-plugins/plugin-aigateway"],
   "settings": {
     "AIGATEWAY_API_KEY": "your-key",
-    "AIGATEWAY_BASE_URL": "https://ai-gateway.vercel.sh/v1/ai"
+    "AIGATEWAY_BASE_URL": "https://ai-gateway.vercel.sh/v1"
   }
 }
 ```

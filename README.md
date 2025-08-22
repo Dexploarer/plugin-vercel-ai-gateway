@@ -47,7 +47,7 @@ For **Vercel AI Gateway**:
 AIGATEWAY_API_KEY=your_vercel_api_key_here
 
 # Optional: Customize gateway URL (defaults to Vercel)
-AIGATEWAY_BASE_URL=https://gateway.vercel.sh/v1
+AIGATEWAY_BASE_URL=https://ai-gateway.vercel.sh/v1
 
 # Optional: Model configuration (use colon format for Vercel)
 AIGATEWAY_DEFAULT_MODEL=openai:gpt-4o-mini
@@ -92,7 +92,7 @@ npm run start -- --character path/to/character.json
 
 ### Vercel AI Gateway (Default) ✅
 ```env
-AIGATEWAY_BASE_URL=https://gateway.vercel.sh/v1
+AIGATEWAY_BASE_URL=https://ai-gateway.vercel.sh/v1
 AIGATEWAY_API_KEY=your_vercel_api_key
 ```
 
@@ -153,7 +153,7 @@ AIGATEWAY_API_KEY=your_gateway_api_key
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `AIGATEWAY_API_KEY` | - | Your gateway API key (required) |
-| `AIGATEWAY_BASE_URL` | `https://gateway.vercel.sh/v1` | Gateway endpoint URL |
+| `AIGATEWAY_BASE_URL` | `https://ai-gateway.vercel.sh/v1` | Gateway endpoint URL |
 | `AIGATEWAY_DEFAULT_MODEL` | `openai:gpt-4o-mini` | Default small model (Vercel format) |
 | `AIGATEWAY_LARGE_MODEL` | `openai:gpt-4o` | Default large model (Vercel format) |
 | `AIGATEWAY_EMBEDDING_MODEL` | `openai:text-embedding-3-small` | Embedding model (Vercel format) |

@@ -18,7 +18,7 @@ export function getBaseURL(runtime: IAgentRuntime): string {
   const baseURL = getSetting(
     runtime,
     "AIGATEWAY_BASE_URL",
-    "https://gateway.vercel.sh/v1",
+    "https://ai-gateway.vercel.sh/v1",
   ) as string;
 
   return baseURL;

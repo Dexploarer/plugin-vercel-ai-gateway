@@ -64,7 +64,7 @@
         "key": "AIGATEWAY_BASE_URL",
         "type": "string",
         "description": "Gateway base URL",
-        "default": "https://gateway.vercel.sh/v1"
+        "default": "https://ai-gateway.vercel.sh/v1"
       },
       {
         "key": "AIGATEWAY_DEFAULT_MODEL",
