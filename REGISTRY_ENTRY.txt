@@ -1,0 +1,13 @@
+REGISTRY ENTRY TO ADD:
+
+"@elizaos-plugins/plugin-vercel-ai-gateway": "github:elizaos-plugins/plugin-vercel-ai-gateway"
+
+ADD THIS TO: index.json in the "plugins" section
+
+EXAMPLE LOCATION:
+{
+  "plugins": {
+    "@elizaos-plugins/plugin-aigateway": "github:elizaos-plugins/plugin-aigateway",
+    "@elizaos-plugins/plugin-vercel-ai-gateway": "github:elizaos-plugins/plugin-vercel-ai-gateway"
+  }
+}
