@@ -1,5 +1,5 @@
 import { IAgentRuntime, ModelType } from '@elizaos/core';
-import aiGatewayPlugin from '@elizaos-plugins/plugin-aigateway';
+import aiGatewayPlugin from '@elizaos-plugins/plugin-vercel-ai-gateway';
 
 /**
  * Example 1: Basic character configuration

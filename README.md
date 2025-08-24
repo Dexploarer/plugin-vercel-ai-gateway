@@ -1,4 +1,4 @@
-# AI Gateway Plugin for elizaOS
+# Vercel AI Gateway Plugin for elizaOS
 
 Access 100+ AI models through Vercel AI Gateway and other unified gateways with automatic failover, caching, and centralized billing. Optimized for Vercel AI Gateway with full support for OpenRouter and other OpenAI-compatible endpoints.
 
@@ -14,20 +14,11 @@ Access 100+ AI models through Vercel AI Gateway and other unified gateways with 
 
 ## Installation
 
-### NPM Package (Available Now)
-```bash
-# Install from npm registry
-npm install @promptordie/plugin-aigateway
-
-# Or using bun
-bun add @promptordie/plugin-aigateway
-```
-
-### Official ElizaOS Registry (Coming Soon)
+### NPM Package (Coming Soon)
 Once merged into the official ElizaOS ecosystem:
 ```bash
 # Will be available as
-npm install @elizaos/plugin-aigateway
+npm install @elizaos-plugins/plugin-vercel-ai-gateway
 ```
 
 ## Quick Start
@@ -64,18 +55,7 @@ AIGATEWAY_MAX_RETRIES=3
 ```json
 {
   "name": "MyAgent",
-  "plugins": ["@promptordie/plugin-aigateway"],
-  "settings": {
-    "AIGATEWAY_API_KEY": "your_api_key_here"
-  }
-}
-```
-
-Or if using the official ElizaOS version (once available):
-```json
-{
-  "name": "MyAgent",
-  "plugins": ["@elizaos/plugin-aigateway"],
+  "plugins": ["@elizaos-plugins/plugin-vercel-ai-gateway"],
   "settings": {
     "AIGATEWAY_API_KEY": "your_api_key_here"
   }
@@ -225,10 +205,7 @@ List available models from the gateway.
 
 ```typescript
 // Using npm package (available now)
-import aiGatewayPlugin from '@promptordie/plugin-aigateway';
-
-// Or when using official ElizaOS version (once available)
-// import aiGatewayPlugin from '@elizaos/plugin-aigateway';
+import aiGatewayPlugin from '@elizaos-plugins/plugin-vercel-ai-gateway';
 
 const character = {
     name: 'MyAgent',
@@ -284,10 +261,7 @@ const images = await runtime.useModel(ModelType.IMAGE, {
 npm test
 
 # Test with elizaOS CLI (using npm package)
-elizaos test --plugin @promptordie/plugin-aigateway
-
-# Or with official package (once available)
-# elizaos test --plugin @elizaos/plugin-aigateway
+elizaos test --plugin @elizaos-plugins/plugin-vercel-ai-gateway
 ```
 
 ## Development
@@ -326,5 +300,5 @@ MIT © elizaOS Community
 ## Support
 
 For issues and questions:
-- GitHub Issues: [plugin-aigateway/issues](https://github.com/elizaos-plugins/plugin-aigateway/issues)
+- GitHub Issues: [plugin-vercel-ai-gateway/issues](https://github.com/elizaos-plugins/plugin-vercel-ai-gateway/issues)
 - Discord: [elizaOS Community](https://discord.gg/elizaos)

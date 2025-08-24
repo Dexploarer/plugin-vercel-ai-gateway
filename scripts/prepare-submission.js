@@ -23,7 +23,7 @@ const REQUIRED_IMAGES = [
   'images/banner.jpg'
 ];
 
-const REGISTRY_ENTRY = '"@elizaos-plugins/plugin-aigateway": "github:elizaos-plugins/plugin-aigateway"';
+const REGISTRY_ENTRY = '"@elizaos-plugins/plugin-vercel-ai-gateway": "github:elizaos-plugins/plugin-vercel-ai-gateway"';
 
 console.log('🚀 AI Gateway Plugin Submission Preparation\n');
 
@@ -74,7 +74,7 @@ console.log('\n📦 Checking package.json...');
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
 const checks = {
-  'Package name': packageJson.name === '@elizaos-plugins/plugin-aigateway',
+  'Package name': packageJson.name === '@elizaos-plugins/plugin-vercel-ai-gateway',
   'Version': !!packageJson.version,
   'Description': !!packageJson.description,
   'Main entry': packageJson.main === 'dist/index.js',
@@ -156,7 +156,7 @@ if (missingImages.length > 0) {
 
 if (!checkFile('.git')) {
   todos.push('Initialize git repository: git init');
-  todos.push('Create GitHub repository: https://github.com/elizaos-plugins/plugin-aigateway');
+  todos.push('Create GitHub repository: https://github.com/elizaos-plugins/plugin-vercel-ai-gateway');
 }
 
 todos.push('Publish to npm: npm publish --access public');

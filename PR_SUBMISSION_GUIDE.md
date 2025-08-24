@@ -28,7 +28,7 @@ This guide outlines the steps needed to submit the AI Gateway Plugin to both the
 ## 🎯 Option 1: Plugin Registry Submission
 
 ### Step 1: Prepare Repository
-1. Create repository at: `https://github.com/elizaos-plugins/plugin-aigateway`
+1. Create repository at: `https://github.com/elizaos-plugins/plugin-vercel-ai-gateway`
 2. Push all code to the repository
 3. Add GitHub topics:
    - `elizaos`
@@ -48,7 +48,7 @@ Create `images/` directory with:
 2. Edit `index.json`:
 ```json
 {
-  "@elizaos-plugins/plugin-aigateway": "github:elizaos-plugins/plugin-aigateway"
+  "@elizaos-plugins/plugin-vercel-ai-gateway": "github:elizaos-plugins/plugin-vercel-ai-gateway"
 }
 ```
 
@@ -86,7 +86,7 @@ Universal AI Gateway integration for accessing 100+ AI models through Vercel, Op
 ```json
 {
   "name": "AIGatewayAgent",
-  "plugins": ["@elizaos-plugins/plugin-aigateway"],
+  "plugins": ["@elizaos-plugins/plugin-vercel-ai-gateway"],
   "settings": {
     "AIGATEWAY_API_KEY": "your-key",
     "AIGATEWAY_BASE_URL": "https://ai-gateway.vercel.sh/v1"
@@ -117,7 +117,7 @@ git checkout -b feat/add-aigateway-plugin
 
 ### Step 2: Add Plugin to Packages
 ```bash
-cp -r ../plugin-gateway packages/plugin-aigateway
+cp -r ../plugin-gateway packages/plugin-vercel-ai-gateway
 ```
 
 ### Step 3: Update Monorepo Configuration
@@ -127,7 +127,7 @@ cp -r ../plugin-gateway packages/plugin-aigateway
 {
   "workspaces": [
     "packages/*",
-    "packages/plugin-aigateway"
+    "packages/plugin-vercel-ai-gateway"
   ]
 }
 ```
@@ -137,7 +137,7 @@ cp -r ../plugin-gateway packages/plugin-aigateway
 {
   "packages": [
     "packages/*",
-    "packages/plugin-aigateway"
+    "packages/plugin-vercel-ai-gateway"
   ]
 }
 ```
@@ -172,7 +172,7 @@ bun test
 This PR adds the AI Gateway plugin to provide universal access to 100+ AI models through various gateway providers (Vercel, OpenRouter, etc.).
 
 ### What does this PR do?
-- ✅ Adds new plugin: `plugin-aigateway`
+- ✅ Adds new plugin: `plugin-vercel-ai-gateway`
 - ✅ Implements all 6 ModelType variants
 - ✅ Provides 4 new actions for AI interactions
 - ✅ Includes caching and retry logic
@@ -193,17 +193,17 @@ This PR adds the AI Gateway plugin to provide universal access to 100+ AI models
 
 ## Testing
 ### Where to start reviewing?
-- `packages/plugin-aigateway/src/index.ts` - Main plugin export
-- `packages/plugin-aigateway/src/actions/` - Action implementations
-- `packages/plugin-aigateway/README.md` - Documentation
+- `packages/plugin-vercel-ai-gateway/src/index.ts` - Main plugin export
+- `packages/plugin-vercel-ai-gateway/src/actions/` - Action implementations
+- `packages/plugin-vercel-ai-gateway/README.md` - Documentation
 
 ### Detailed testing steps
 1. Install dependencies: `bun install`
 2. Set environment variable: `AIGATEWAY_API_KEY=your-key`
-3. Run tests: `cd packages/plugin-aigateway && bun test`
+3. Run tests: `cd packages/plugin-vercel-ai-gateway && bun test`
 4. Test with example agent:
 ```typescript
-import aiGatewayPlugin from '@elizaos/plugin-aigateway';
+import aiGatewayPlugin from '@elizaos-plugins/plugin-vercel-ai-gateway';
 
 const agent = {
   plugins: [aiGatewayPlugin],

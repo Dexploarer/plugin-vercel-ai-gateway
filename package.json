@@ -1,18 +1,18 @@
 {
-  "name": "@elizaos/plugin-aigateway",
+  "name": "@elizaos-plugins/plugin-vercel-ai-gateway",
   "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "description": "Universal AI Gateway integration plugin for elizaOS - Access 100+ AI models through unified gateways",
+  "description": "Universal AI Gateway integration plugin for elizaOS - Access 100+ AI models through Vercel AI Gateway and other unified gateways",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elizaos/plugin-aigateway.git"
+    "url": "git+https://github.com/elizaos-plugins/plugin-vercel-ai-gateway.git"
   },
-  "homepage": "https://github.com/elizaos/plugin-aigateway#readme",
+  "homepage": "https://github.com/elizaos-plugins/plugin-vercel-ai-gateway#readme",
   "bugs": {
-    "url": "https://github.com/elizaos/plugin-aigateway/issues"
+    "url": "https://github.com/elizaos-plugins/plugin-vercel-ai-gateway/issues"
   },
   "keywords": [
     "elizaos",

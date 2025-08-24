@@ -45,13 +45,13 @@ npm run build
 npm publish --access public
 
 # 4. Verify on npm
-# Visit: https://www.npmjs.com/package/@elizaos-plugins/plugin-aigateway
+# Visit: https://www.npmjs.com/package/@elizaos-plugins/plugin-vercel-ai-gateway
 ```
 
 ### 🗂️ Plugin Registry Submission
 
 #### 1. Create GitHub Repository
-- [ ] Create repo: `https://github.com/elizaos-plugins/plugin-aigateway`
+- [ ] Create repo: `https://github.com/elizaos-plugins/plugin-vercel-ai-gateway`
 - [ ] Push all code
 - [ ] Add GitHub topics:
   - `elizaos`
@@ -72,7 +72,7 @@ cd registry
 #### 3. Update Registry index.json
 Add this line in alphabetical order:
 ```json
-"@elizaos-plugins/plugin-aigateway": "github:elizaos-plugins/plugin-aigateway",
+"@elizaos-plugins/plugin-vercel-ai-gateway": "github:elizaos-plugins/plugin-vercel-ai-gateway",
 ```
 
 #### 4. Create Pull Request
@@ -92,8 +92,8 @@ git checkout -b feat/add-aigateway-plugin
 
 #### 2. Add Plugin to Packages
 ```bash
-cp -r ../plugin-gateway packages/plugin-aigateway
-cd packages/plugin-aigateway
+cp -r ../plugin-gateway packages/plugin-vercel-ai-gateway
+cd packages/plugin-vercel-ai-gateway
 rm -rf node_modules .git
 ```
 
