@@ -5,9 +5,9 @@
  * This script helps prepare the plugin for submission to the registry or main repo
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { execSync } from 'child_process';
 
 const REQUIRED_FILES = [
   'package.json',
