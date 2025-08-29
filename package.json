@@ -1,5 +1,5 @@
 {
-  "name": "@elizaos-plugins/plugin-vercel-ai-gateway",
+  "name": "@dexploarer/plugin-vercel-ai-gateway",
   "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",
@@ -8,11 +8,11 @@
   "description": "Universal AI Gateway integration plugin for elizaOS - Access 100+ AI models through Vercel AI Gateway and other unified gateways",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elizaos-plugins/plugin-vercel-ai-gateway.git"
+    "url": "git+https://github.com/Dexploarer/plugin-vercel-ai-gateway.git"
   },
-  "homepage": "https://github.com/elizaos-plugins/plugin-vercel-ai-gateway#readme",
+  "homepage": "https://github.com/Dexploarer/plugin-vercel-ai-gateway#readme",
   "bugs": {
-    "url": "https://github.com/elizaos-plugins/plugin-vercel-ai-gateway/issues"
+    "url": "https://github.com/Dexploarer/plugin-vercel-ai-gateway/issues"
   },
   "keywords": [
     "elizaos",
@@ -23,7 +23,7 @@
     "openrouter",
     "multi-provider"
   ],
-  "author": "elizaOS Community",
+  "author": "Dexploarer",
   "license": "MIT",
   "exports": {
     "./package.json": "./package.json",
