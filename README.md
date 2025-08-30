@@ -1,5 +1,11 @@
 # Vercel AI Gateway Plugin for elizaOS
 
+![Vercel AI Gateway Plugin Banner](./images/banner.jpg)
+
+<div align="center">
+  <img src="./images/logo.jpg" alt="Vercel AI Gateway Plugin Logo" width="200" height="200" />
+</div>
+
 Access 100+ AI models through Vercel AI Gateway and other unified gateways with automatic failover, caching, and centralized billing. Optimized for Vercel AI Gateway with full support for OpenRouter and other OpenAI-compatible endpoints.
 
 ## Features
