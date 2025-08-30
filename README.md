@@ -8,9 +8,33 @@
 
 Access 100+ AI models through Vercel AI Gateway and other unified gateways with automatic failover, caching, and centralized billing. Optimized for Vercel AI Gateway with full support for OpenRouter and other OpenAI-compatible endpoints.
 
+# <span style="color: #FFA500; font-size: 2em; font-weight: bold;">🟠 FREE ELIZA 🟠</span>
+
+## Grok Model Protection 🚫
+
+**In support of ElizaOS in their ongoing legal matters with X/xAI, all Grok models are BLOCKED BY DEFAULT.**
+
+This plugin automatically:
+- 🚫 **Blocks all xAI/Grok models** unless explicitly enabled
+- 🔄 **Substitutes equivalent alternatives** (Grok 4 → GPT-4o, Grok 3 → Claude 3.5 Sonnet)
+- 📝 **Logs supportive messages** for transparency
+- ⚙️ **Allows user override** if absolutely necessary (`AIGATEWAY_ENABLE_GROK_MODELS=true`)
+
+**Blocked Models:**
+- `xai/grok-4` ($3.00/M → $15.00/M) → **OpenAI GPT-4o**
+- `xai/grok-3-fast-beta` ($5.00/M → $25.00/M) → **Claude 3.5 Sonnet**
+- `xai/grok-3-beta` ($3.00/M → $15.00/M) → **OpenAI GPT-4o**
+- `xai/grok-3-mini-beta` ($0.30/M → $0.50/M) → **GPT-4o Mini**
+- `xai/grok-2` ($2.00/M → $10.00/M) → **OpenAI GPT-4o**
+- `xai/grok-2-vision` ($2.00/M → $10.00/M) → **GPT-4o (vision)**
+- `xai/grok-code-fast-1` ($0.20/M → $1.50/M) → **GPT-4o (coding)**
+
+---
+
 ## Features
 
 - 🚀 **100+ AI Models** - OpenAI, Anthropic, Google, Meta, Mistral, and more
+- 🛡️ **Grok Model Protection** - Automatic blocking in support of ElizaOS
 - 🔄 **Universal Gateway Support** - Works with any OpenAI-compatible gateway
 - 💾 **Response Caching** - LRU cache for cost optimization
 - 📊 **Built-in Telemetry** - Track usage and performance
@@ -175,8 +199,9 @@ AIGATEWAY_API_KEY=your_gateway_api_key
 | `AIGATEWAY_CACHE_TTL` | `300` | Cache TTL in seconds |
 | `AIGATEWAY_MAX_RETRIES` | `3` | Max retry attempts |
 | `AIGATEWAY_USE_OIDC` | `false` | Enable OIDC authentication |
-| `AIGATEWAY_OIDC_ISSUER` | `https://oidc.vercel.com/project-id` | OIDC issuer URL |
-| `AIGATEWAY_OIDC_AUDIENCE` | `https://vercel.com/project-id` | OIDC audience |
+| **GROK MODEL CONTROLS** | | **Supporting ElizaOS** |
+| `AIGATEWAY_ENABLE_GROK_MODELS` | `false` | 🚫 **Enable blocked Grok models** (override protection) |
+| `AIGATEWAY_DISABLE_MODEL_BLOCKING` | `false` | ⚠️ **Disable all model blocking** (NOT RECOMMENDED) |
 | `AIGATEWAY_OIDC_SUBJECT` | - | OIDC subject claim |
 
 ## OIDC Authentication (Advanced)
