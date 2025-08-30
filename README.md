@@ -1,5 +1,11 @@
 # Vercel AI Gateway Plugin for elizaOS
 
+![Vercel AI Gateway Plugin Banner](https://raw.githubusercontent.com/Dexploarer/plugin-vercel-ai-gateway/main/images/banner.jpg)
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Dexploarer/plugin-vercel-ai-gateway/main/images/logo.jpg" alt="Vercel AI Gateway Plugin Logo" width="200" height="200" />
+</div>
+
 Access 100+ AI models through Vercel AI Gateway and other unified gateways with automatic failover, caching, and centralized billing. Optimized for Vercel AI Gateway with full support for OpenRouter and other OpenAI-compatible endpoints.
 
 ## Features
@@ -14,11 +20,9 @@ Access 100+ AI models through Vercel AI Gateway and other unified gateways with 
 
 ## Installation
 
-### NPM Package (Coming Soon)
-Once merged into the official ElizaOS ecosystem:
+### NPM Package
 ```bash
-# Will be available as
-npm install @elizaos-plugins/plugin-vercel-ai-gateway
+npm install @dexploarer/plugin-vercel-ai-gateway
 ```
 
 ## Quick Start
@@ -55,7 +59,7 @@ AIGATEWAY_MAX_RETRIES=3
 ```json
 {
   "name": "MyAgent",
-  "plugins": ["@elizaos-plugins/plugin-vercel-ai-gateway"],
+  "plugins": ["@dexploarer/plugin-vercel-ai-gateway"],
   "settings": {
     "AIGATEWAY_API_KEY": "your_api_key_here"
   }
@@ -132,7 +136,8 @@ AIGATEWAY_API_KEY=your_gateway_api_key
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `AIGATEWAY_API_KEY` | - | Your gateway API key (required) |
+| `AI_GATEWAY_API_KEY` | - | Your gateway API key (primary method) |
+| `AIGATEWAY_API_KEY` | - | Alternative API key variable (compatibility) |
 | `AIGATEWAY_BASE_URL` | `https://ai-gateway.vercel.sh/v1` | Gateway endpoint URL |
 | `AIGATEWAY_DEFAULT_MODEL` | `openai:gpt-4o-mini` | Default small model (Vercel format) |
 | `AIGATEWAY_LARGE_MODEL` | `openai:gpt-4o` | Default large model (Vercel format) |
@@ -140,6 +145,120 @@ AIGATEWAY_API_KEY=your_gateway_api_key
 | `AIGATEWAY_CACHE_TTL` | `300` | Cache TTL in seconds |
 | `AIGATEWAY_MAX_RETRIES` | `3` | Max retry attempts |
 | `AIGATEWAY_USE_OIDC` | `false` | Enable OIDC authentication |
+| `AIGATEWAY_OIDC_ISSUER` | `https://oidc.vercel.com/project-id` | OIDC issuer URL |
+| `AIGATEWAY_OIDC_AUDIENCE` | `https://vercel.com/project-id` | OIDC audience |
+| `AIGATEWAY_OIDC_SUBJECT` | - | OIDC subject claim |
+
+## OIDC Authentication (Advanced)
+
+The plugin supports secure authentication using OpenID Connect (OIDC) JWT tokens from Vercel, providing enhanced security for production deployments.
+
+### OIDC Setup (Recommended for Vercel Projects)
+
+1. **Link your project to Vercel:**
+```bash
+vercel link
+```
+
+2. **Pull environment variables (includes OIDC tokens):**
+```bash
+vercel env pull
+```
+
+3. **Enable OIDC in your character:**
+```json
+{
+  "name": "MyAgent",
+  "secrets": {
+    "AIGATEWAY_USE_OIDC": "true"
+  }
+}
+```
+
+**Note:** When using standard Vercel OIDC, you don't need to manually configure issuer, audience, or subject. The plugin will automatically use the OIDC tokens provided by `vercel env pull`.
+
+### Advanced OIDC Configuration (Custom Setup)
+
+If you need custom OIDC configuration:
+```env
+# Enable OIDC authentication
+AIGATEWAY_USE_OIDC=true
+
+# Custom OIDC Configuration
+AIGATEWAY_OIDC_ISSUER=https://oidc.vercel.com/your-project-id
+AIGATEWAY_OIDC_AUDIENCE=https://vercel.com/your-project-id
+AIGATEWAY_OIDC_SUBJECT=owner:your-project-id:project:your-project:environment:production
+```
+
+### OIDC vs API Key Authentication
+
+| Feature | API Key | OIDC |
+|---------|---------|------|
+| Security | Good | Excellent (JWT tokens) |
+| Setup | Simple | Advanced |
+| Token Management | Manual | Automatic refresh |
+| Production Ready | Basic | Enterprise-grade |
+| Audit Trail | Limited | Comprehensive |
+
+### OIDC Character Configuration
+
+```json
+{
+  "name": "SecureAgent",
+  "plugins": ["@dexploarer/plugin-vercel-ai-gateway"],
+  "secrets": {
+    "AIGATEWAY_USE_OIDC": "true",
+    "AIGATEWAY_OIDC_ISSUER": "https://oidc.vercel.com/wes-projects-9373916e",
+    "AIGATEWAY_OIDC_AUDIENCE": "https://vercel.com/wes-projects-9373916e",
+    "AIGATEWAY_OIDC_SUBJECT": "owner:wes-projects-9373916e:project:verceliza:environment:production"
+  }
+}
+```
+
+### OIDC Token Management
+
+The plugin automatically:
+- ✅ **Reads OIDC tokens from environment** (provided by `vercel env pull`)
+- ✅ **Caches tokens** with automatic refresh before expiration
+- ✅ **Validates token expiration** (12-hour validity per Vercel)
+- ✅ **Includes proper authorization headers**
+- ✅ **Handles token refresh** transparently
+
+### OIDC Troubleshooting
+
+**Common Issues:**
+
+1. **"OIDC authentication failed: No valid token available"**
+   ```bash
+   # Solution: Pull latest environment variables
+   vercel env pull
+   ```
+
+2. **"OIDC token expired"**
+   ```bash
+   # Solution: Refresh environment variables (tokens valid for 12 hours)
+   vercel env pull
+   ```
+
+3. **"Project not linked to Vercel"**
+   ```bash
+   # Solution: Link your project first
+   vercel link
+   vercel env pull
+   ```
+
+4. **Custom OIDC configuration issues**
+   - Verify `AIGATEWAY_OIDC_ISSUER` URL is correct
+   - Check `AIGATEWAY_OIDC_AUDIENCE` matches your Vercel project
+   - Ensure `AIGATEWAY_OIDC_SUBJECT` has proper format
+
+**Debug OIDC:**
+```bash
+export DEBUG="OIDC:*"
+# Check what OIDC environment variables are available
+env | grep -i vercel
+# Then run your agent to see detailed OIDC logs
+```
 
 ## Actions
 
@@ -204,8 +323,8 @@ List available models from the gateway.
 ### Basic Usage
 
 ```typescript
-// Using npm package (available now)
-import aiGatewayPlugin from '@elizaos-plugins/plugin-vercel-ai-gateway';
+// Using npm package
+import aiGatewayPlugin from '@dexploarer/plugin-vercel-ai-gateway';
 
 const character = {
     name: 'MyAgent',
@@ -261,7 +380,7 @@ const images = await runtime.useModel(ModelType.IMAGE, {
 npm test
 
 # Test with elizaOS CLI (using npm package)
-elizaos test --plugin @elizaos-plugins/plugin-vercel-ai-gateway
+elizaos test --plugin @dexploarer/plugin-vercel-ai-gateway
 ```
 
 ## Development
@@ -300,5 +419,5 @@ MIT © elizaOS Community
 ## Support
 
 For issues and questions:
-- GitHub Issues: [plugin-vercel-ai-gateway/issues](https://github.com/elizaos-plugins/plugin-vercel-ai-gateway/issues)
+- GitHub Issues: [plugin-vercel-ai-gateway/issues](https://github.com/Dexploarer/plugin-vercel-ai-gateway/issues)
 - Discord: [elizaOS Community](https://discord.gg/elizaos)
