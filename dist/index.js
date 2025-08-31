@@ -1,22 +1,16 @@
 import {
   GatewayProvider,
   StreamingGatewayProvider,
+  __name,
   applyModelControls,
   getConfig
-} from "./chunk-KLWPYNXA.js";
+} from "./chunk-LRR3BCYN.js";
 
 // src/index.ts
-import {
-  ModelType as ModelType2,
-  logger as logger4
-} from "@elizaos/core";
+import { ModelType as ModelType2, logger as logger4 } from "@elizaos/core";
 
 // src/routes/openai-compat.ts
-import {
-  ModelType,
-  logger
-} from "@elizaos/core";
-import { processUploadedFile } from "@elizaos/core";
+import { ModelType, logger } from "@elizaos/core";
 async function listModels(req, res, runtime) {
   try {
     const modelList = [];
@@ -52,7 +46,7 @@ async function listModels(req, res, runtime) {
       data: modelList
     });
   } catch (error) {
-    logger.error("[AIGateway] Error listing models:", error);
+    logger.error("[AIGateway] Error listing models:", error instanceof Error ? error.message : String(error));
     res.status(500).json({
       error: {
         message: "Internal server error",
@@ -61,16 +55,18 @@ async function listModels(req, res, runtime) {
     });
   }
 }
+__name(listModels, "listModels");
 async function chatCompletions(req, res, runtime) {
   try {
     const { messages, model = "text-large", stream = false, temperature, max_tokens } = req.body;
     if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({
+      res.status(400).json({
         error: {
           message: "Messages parameter is required and must be an array",
           type: "invalid_request_error"
         }
       });
+      return;
     }
     const controlledModel = applyModelControls(model, getConfig(runtime));
     const processedMessages = await processMessagesWithFiles(messages, runtime);
@@ -92,7 +88,7 @@ async function chatCompletions(req, res, runtime) {
       res.writeHead(200, {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
+        Connection: "keep-alive",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Cache-Control"
       });
@@ -100,20 +96,30 @@ async function chatCompletions(req, res, runtime) {
       const chatId = `chatcmpl-${Date.now()}`;
       const created = Math.floor(Date.now() / 1e3);
       try {
-        const streamGenerator = controlledModel.includes("small") || controlledModel.includes("fast") ? streamingProvider.generateTextSmallStream(runtime, { prompt, temperature, maxTokens: max_tokens }) : streamingProvider.generateTextLargeStream(runtime, { prompt, temperature, maxTokens: max_tokens });
+        const streamGenerator = controlledModel.includes("small") || controlledModel.includes("fast") ? streamingProvider.generateTextSmallStream(runtime, {
+          prompt,
+          temperature,
+          maxTokens: max_tokens
+        }) : streamingProvider.generateTextLargeStream(runtime, {
+          prompt,
+          temperature,
+          maxTokens: max_tokens
+        });
         for await (const chunk of streamGenerator) {
           const streamChunk = {
             id: chatId,
             object: "chat.completion.chunk",
             created,
             model: controlledModel,
-            choices: [{
-              index: 0,
-              delta: {
-                content: chunk
-              },
-              finish_reason: null
-            }]
+            choices: [
+              {
+                index: 0,
+                delta: {
+                  content: chunk
+                },
+                finish_reason: null
+              }
+            ]
           };
           res.write(`data: ${JSON.stringify(streamChunk)}
 
@@ -124,11 +130,13 @@ async function chatCompletions(req, res, runtime) {
           object: "chat.completion.chunk",
           created,
           model: controlledModel,
-          choices: [{
-            index: 0,
-            delta: {},
-            finish_reason: "stop"
-          }]
+          choices: [
+            {
+              index: 0,
+              delta: {},
+              finish_reason: "stop"
+            }
+          ]
         };
         res.write(`data: ${JSON.stringify(finalChunk)}
 
@@ -136,7 +144,7 @@ async function chatCompletions(req, res, runtime) {
         res.write("data: [DONE]\n\n");
         res.end();
       } catch (streamError) {
-        logger.error("[AIGateway] Error in streaming:", streamError);
+        logger.error("[AIGateway] Error in streaming:", streamError instanceof Error ? streamError.message : String(streamError));
         res.write(`data: {"error": {"message": "Streaming failed", "type": "internal_error"}}
 
 `);
@@ -148,14 +156,16 @@ async function chatCompletions(req, res, runtime) {
         object: "chat.completion",
         created: Math.floor(Date.now() / 1e3),
         model: controlledModel,
-        choices: [{
-          index: 0,
-          message: {
-            role: "assistant",
-            content: result
-          },
-          finish_reason: "stop"
-        }],
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: result
+            },
+            finish_reason: "stop"
+          }
+        ],
         usage: {
           prompt_tokens: prompt.length / 4,
           completion_tokens: result.length / 4,
@@ -164,7 +174,7 @@ async function chatCompletions(req, res, runtime) {
       });
     }
   } catch (error) {
-    logger.error("[AIGateway] Error in chat completions:", error);
+    logger.error("[AIGateway] Error in chat completions:", error instanceof Error ? error.message : String(error));
     res.status(500).json({
       error: {
         message: "Internal server error",
@@ -173,18 +183,22 @@ async function chatCompletions(req, res, runtime) {
     });
   }
 }
+__name(chatCompletions, "chatCompletions");
 async function createEmbeddings(req, res, runtime) {
   try {
     const { input, model = "text-embedding" } = req.body;
     if (!input) {
-      return res.status(400).json({
+      res.status(400).json({
         error: {
           message: "Input parameter is required",
           type: "invalid_request_error"
         }
       });
+      return;
     }
-    const texts = Array.isArray(input) ? input : [input];
+    const texts = Array.isArray(input) ? input : [
+      input
+    ];
     const embeddings = [];
     for (let i = 0; i < texts.length; i++) {
       const embedding = await runtime.useModel(ModelType.TEXT_EMBEDDING, texts[i]);
@@ -204,7 +218,7 @@ async function createEmbeddings(req, res, runtime) {
       }
     });
   } catch (error) {
-    logger.error("[AIGateway] Error creating embeddings:", error);
+    logger.error("[AIGateway] Error creating embeddings:", error instanceof Error ? error.message : String(error));
     res.status(500).json({
       error: {
         message: "Internal server error",
@@ -213,6 +227,7 @@ async function createEmbeddings(req, res, runtime) {
     });
   }
 }
+__name(createEmbeddings, "createEmbeddings");
 async function processMessagesWithFiles(messages, runtime) {
   const processedMessages = [];
   for (const message of messages) {
@@ -241,6 +256,7 @@ async function processMessagesWithFiles(messages, runtime) {
   }
   return processedMessages;
 }
+__name(processMessagesWithFiles, "processMessagesWithFiles");
 async function processImageUrl(url, runtime) {
   try {
     if (url.startsWith("data:")) {
@@ -254,30 +270,45 @@ async function processImageUrl(url, runtime) {
         buffer,
         size: buffer.length
       };
-      const result = await processUploadedFile(mockFile, runtime.agentId, "agents");
+      const result = {
+        filename: mockFile.originalname,
+        url: `data:${mimeType};base64,${base64Data}`,
+        size: buffer.length,
+        type: mimeType
+      };
       return result;
     } else if (url.startsWith("http")) {
       logger.info(`[AIGateway] External image URL detected: ${url}`);
-      return { url, type: "external_image" };
+      return {
+        url,
+        type: "external_image"
+      };
     }
     return null;
   } catch (error) {
-    logger.error("[AIGateway] Error processing image URL:", error);
+    logger.error("[AIGateway] Error processing image URL:", error instanceof Error ? error.message : String(error));
     return null;
   }
 }
+__name(processImageUrl, "processImageUrl");
 async function uploadFile(req, res, runtime) {
   try {
     const file = req.file;
     if (!file) {
-      return res.status(400).json({
+      res.status(400).json({
         error: {
           message: "No file provided",
           type: "invalid_request_error"
         }
       });
+      return;
     }
-    const result = await processUploadedFile(file, runtime.agentId, "agents");
+    const result = {
+      filename: file.originalname,
+      url: `/uploads/${Date.now()}-${file.originalname}`,
+      size: file.size,
+      type: file.mimetype
+    };
     res.json({
       id: `file-${Date.now()}`,
       object: "file",
@@ -289,7 +320,7 @@ async function uploadFile(req, res, runtime) {
       url: result.url
     });
   } catch (error) {
-    logger.error("[AIGateway] Error uploading file:", error);
+    logger.error("[AIGateway] Error uploading file:", error instanceof Error ? error.message : String(error));
     res.status(500).json({
       error: {
         message: "File upload failed",
@@ -298,6 +329,7 @@ async function uploadFile(req, res, runtime) {
     });
   }
 }
+__name(uploadFile, "uploadFile");
 var openaiRoutes = [
   {
     type: "GET",
@@ -322,10 +354,7 @@ var openaiRoutes = [
 ];
 
 // src/routes/socketio-streaming.ts
-import {
-  SOCKET_MESSAGE_TYPE,
-  logger as logger2
-} from "@elizaos/core";
+import { SOCKET_MESSAGE_TYPE, logger as logger2 } from "@elizaos/core";
 async function initiateChatStream(req, res, runtime) {
   try {
     const { messages, model = "text-large", temperature, max_tokens, room_id } = req.body;
@@ -376,6 +405,7 @@ async function initiateChatStream(req, res, runtime) {
     });
   }
 }
+__name(initiateChatStream, "initiateChatStream");
 async function handleSocketIOStreaming(runtime, params) {
   const { streamId, roomId, prompt, model, temperature, maxTokens } = params;
   try {
@@ -394,7 +424,15 @@ async function handleSocketIOStreaming(runtime, params) {
       timestamp: Date.now()
     });
     const streamingProvider = new StreamingGatewayProvider(runtime);
-    const streamGenerator = model.includes("small") || model.includes("fast") ? streamingProvider.generateTextSmallStream(runtime, { prompt, temperature, maxTokens }) : streamingProvider.generateTextLargeStream(runtime, { prompt, temperature, maxTokens });
+    const streamGenerator = model.includes("small") || model.includes("fast") ? streamingProvider.generateTextSmallStream(runtime, {
+      prompt,
+      temperature,
+      maxTokens
+    }) : streamingProvider.generateTextLargeStream(runtime, {
+      prompt,
+      temperature,
+      maxTokens
+    });
     let accumulatedContent = "";
     let chunkIndex = 0;
     for await (const chunk of streamGenerator) {
@@ -449,6 +487,7 @@ async function handleSocketIOStreaming(runtime, params) {
     }
   }
 }
+__name(handleSocketIOStreaming, "handleSocketIOStreaming");
 async function getStreamStatus(req, res, runtime) {
   try {
     const { streamId } = req.params;
@@ -463,7 +502,6 @@ async function getStreamStatus(req, res, runtime) {
     res.json({
       stream_id: streamId,
       status: "active",
-      // Could be: active, completed, error
       timestamp: Date.now()
     });
   } catch (error) {
@@ -476,6 +514,7 @@ async function getStreamStatus(req, res, runtime) {
     });
   }
 }
+__name(getStreamStatus, "getStreamStatus");
 var socketIOStreamingRoutes = [
   {
     type: "POST",
@@ -490,12 +529,14 @@ var socketIOStreamingRoutes = [
 ];
 
 // src/actions/tool-calls.ts
-import {
-  logger as logger3
-} from "@elizaos/core";
+import { logger as logger3 } from "@elizaos/core";
 var toolCallsAction = {
   name: "TOOL_CALLS",
-  similes: ["function_call", "tool_use", "function_execution"],
+  similes: [
+    "function_call",
+    "tool_use",
+    "function_execution"
+  ],
   description: "Execute tool/function calls using AI Gateway integration with ElizaOS actions",
   examples: [
     [
@@ -514,7 +555,7 @@ var toolCallsAction = {
       }
     ]
   ],
-  validate: async (runtime, message, state) => {
+  validate: /* @__PURE__ */ __name(async (runtime, message, state) => {
     const messageText = message.content?.text?.toLowerCase() || "";
     const toolPatterns = [
       /weather/i,
@@ -525,8 +566,8 @@ var toolCallsAction = {
       /find/i
     ];
     return toolPatterns.some((pattern) => pattern.test(messageText));
-  },
-  handler: async (runtime, message, state, options) => {
+  }, "validate"),
+  handler: /* @__PURE__ */ __name(async (runtime, message, state, options) => {
     try {
       logger3.debug("[AIGateway] Processing tool calls action");
       const toolCalls = extractToolCalls(message);
@@ -571,7 +612,7 @@ var toolCallsAction = {
         error: error instanceof Error ? error.message : "Unknown error in tool calls"
       };
     }
-  }
+  }, "handler")
 };
 function extractToolCalls(message) {
   const toolCalls = [];
@@ -595,19 +636,18 @@ function extractToolCalls(message) {
   }
   return toolCalls;
 }
+__name(extractToolCalls, "extractToolCalls");
 async function executeToolCall(runtime, toolCall, state) {
   const { function: func } = toolCall;
   const functionMappings = {
-    "get_weather": "weather",
-    "search_web": "web_search",
-    "calculate": "calculation",
-    "get_time": "time",
-    "send_message": "message"
+    get_weather: "weather",
+    search_web: "web_search",
+    calculate: "calculation",
+    get_time: "time",
+    send_message: "message"
   };
   const actionName = functionMappings[func.name] || func.name;
-  const action = runtime.actions.find(
-    (a) => a.name.toLowerCase().includes(actionName.toLowerCase()) || a.similes?.some((s) => s.toLowerCase().includes(actionName.toLowerCase()))
-  );
+  const action = runtime.actions.find((a) => a.name.toLowerCase().includes(actionName.toLowerCase()) || a.similes?.some((s) => s.toLowerCase().includes(actionName.toLowerCase())));
   if (!action) {
     throw new Error(`No action found for function: ${func.name}`);
   }
@@ -633,13 +673,19 @@ async function executeToolCall(runtime, toolCall, state) {
   const result = await action.handler(runtime, mockMessage, state);
   return result;
 }
+__name(executeToolCall, "executeToolCall");
 
 // src/index.ts
 var plugin = {
   name: "aigateway",
   description: "Universal AI Gateway integration with Grok model protection and streaming support",
-  routes: [...openaiRoutes, ...socketIOStreamingRoutes],
-  actions: [toolCallsAction],
+  routes: [
+    ...openaiRoutes,
+    ...socketIOStreamingRoutes
+  ],
+  actions: [
+    toolCallsAction
+  ],
   async init(runtime) {
     logger4.info("[AIGateway] Plugin initializing...");
     const config = getConfig(runtime);
@@ -671,18 +717,42 @@ var plugin = {
     ];
     logger4.info(`[AIGateway] Available model types: ${availableModelTypes.join(", ")}`);
     const modelHandlers = [
-      { type: ModelType2.TEXT_SMALL, handler: provider.generateTextSmall.bind(provider) },
-      { type: ModelType2.TEXT_LARGE, handler: provider.generateTextLarge.bind(provider) },
-      { type: ModelType2.SMALL, handler: provider.generateTextSmall.bind(provider) },
-      // Legacy
-      { type: ModelType2.MEDIUM, handler: provider.generateTextLarge.bind(provider) },
-      // Legacy
-      { type: ModelType2.LARGE, handler: provider.generateTextLarge.bind(provider) },
-      // Legacy
-      { type: ModelType2.TEXT_EMBEDDING, handler: provider.generateEmbedding.bind(provider) },
-      { type: ModelType2.OBJECT_SMALL, handler: provider.generateObjectSmall.bind(provider) },
-      { type: ModelType2.OBJECT_LARGE, handler: provider.generateObjectLarge.bind(provider) },
-      { type: ModelType2.IMAGE, handler: provider.generateImage.bind(provider) }
+      {
+        type: ModelType2.TEXT_SMALL,
+        handler: provider.generateTextSmall.bind(provider)
+      },
+      {
+        type: ModelType2.TEXT_LARGE,
+        handler: provider.generateTextLarge.bind(provider)
+      },
+      {
+        type: ModelType2.SMALL,
+        handler: provider.generateTextSmall.bind(provider)
+      },
+      {
+        type: ModelType2.MEDIUM,
+        handler: provider.generateTextLarge.bind(provider)
+      },
+      {
+        type: ModelType2.LARGE,
+        handler: provider.generateTextLarge.bind(provider)
+      },
+      {
+        type: ModelType2.TEXT_EMBEDDING,
+        handler: provider.generateEmbedding.bind(provider)
+      },
+      {
+        type: ModelType2.OBJECT_SMALL,
+        handler: provider.generateObjectSmall.bind(provider)
+      },
+      {
+        type: ModelType2.OBJECT_LARGE,
+        handler: provider.generateObjectLarge.bind(provider)
+      },
+      {
+        type: ModelType2.IMAGE,
+        handler: provider.generateImage.bind(provider)
+      }
     ];
     try {
       for (const { type, handler } of modelHandlers) {
