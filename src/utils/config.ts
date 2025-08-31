@@ -8,7 +8,11 @@ function getSetting(
   key: string,
   defaultValue?: string
 ): string | undefined {
-  return runtime.getSetting?.(key) ?? process.env[key] ?? defaultValue;
+  // Handle case where runtime might not have getSetting method
+  if (runtime && typeof runtime.getSetting === 'function') {
+    return runtime.getSetting(key) ?? process.env[key] ?? defaultValue;
+  }
+  return process.env[key] ?? defaultValue;
 }
 
 /**
