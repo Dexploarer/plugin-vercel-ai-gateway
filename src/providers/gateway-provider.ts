@@ -242,17 +242,8 @@ export class GatewayProvider {
 
     logger.info(`[AIGateway] Using embedding model: ${modelToUse}`);
 
-    if (params === null) {
-      logger.debug("[AIGateway] Creating test embedding for initialization");
-      const testVector = Array(1536).fill(0); // Default OpenAI embedding dimension
-      return testVector;
-    }
-
-    // Check cache
-    const cacheKey = this.cache.generateKey({
-      model: modelToUse,
-      text: params.text,
-    });
+    const cacheKey = `embedding:${modelToUse}:${params.text}`;
+    logger.debug("[AIGateway] Checking cache for embedding");
     const cached = this.cache.get<number[]>(cacheKey);
     if (cached) {
       logger.debug("[AIGateway] Cache hit for embedding");
@@ -261,41 +252,17 @@ export class GatewayProvider {
 
     const result = await pRetry(
       async () => {
+        const { embed } = await import('ai');
+        const { createOpenAI } = await import('@ai-sdk/openai');
+        
+        // Create OpenAI provider instance with AI Gateway configuration
+        const provider = createOpenAI({
+          apiKey: getApiKey(this.runtime),
+          baseURL: getBaseURL(this.runtime),
+        });
+        
         const response = await embed({
-          model: {
-            modelId: modelToUse,
-            specificationVersion: 'v1',
-            provider: 'aigateway',
-            maxEmbeddingsPerCall: 1,
-            supportsParallelCalls: false,
-            doEmbed: async ({ values, headers, abortSignal }) => {
-              const apiKey = getApiKey(this.runtime);
-              const baseURL = getBaseURL(this.runtime);
-              
-              const response = await fetch(`${baseURL}/embeddings`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${apiKey}`,
-                  ...headers,
-                },
-                body: JSON.stringify({
-                  model: modelToUse,
-                  input: values[0],
-                }),
-                signal: abortSignal,
-              });
-
-              if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-              }
-
-              const data = await response.json();
-              return {
-                embeddings: [data.data[0].embedding],
-              };
-            },
-          },
+          model: provider.textEmbeddingModel(modelToUse),
           value: params.text,
         });
 
