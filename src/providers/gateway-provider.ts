@@ -253,19 +253,12 @@ export class GatewayProvider {
     const result = await pRetry(
       async () => {
         const { embed } = await import('ai');
-        const { createOpenAI } = await import('@ai-sdk/openai');
         
-        // Create OpenAI provider instance with AI Gateway configuration
-        const provider = createOpenAI({
-          apiKey: getApiKey(this.runtime),
-          baseURL: getBaseURL(this.runtime),
-        });
+        logger.info(`[AIGateway] Embedding request - Model: ${modelToUse}, Text: "${params.text}"`);
         
-        // Strip provider prefix for AI Gateway compatibility
-        const modelName = modelToUse.replace(/^openai\//, '');
-        
+        // Use AI Gateway with string model specification
         const response = await embed({
-          model: provider.textEmbeddingModel(modelName),
+          model: modelToUse,
           value: params.text,
         });
 
