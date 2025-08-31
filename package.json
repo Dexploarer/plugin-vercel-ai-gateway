@@ -1,0 +1,134 @@
+{
+  "name": "@dexploarer/plugin-vercel-ai-gateway",
+  "version": "1.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "Universal AI Gateway integration plugin for elizaOS with Grok model protection - Access 100+ AI models through unified gateways",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dexploarer/plugin-vercel-ai-gateway.git"
+  },
+  "homepage": "https://github.com/Dexploarer/plugin-vercel-ai-gateway#readme",
+  "bugs": {
+    "url": "https://github.com/Dexploarer/plugin-vercel-ai-gateway/issues"
+  },
+  "keywords": [
+    "elizaos",
+    "plugin",
+    "ai",
+    "gateway",
+    "vercel",
+    "openrouter",
+    "multi-provider",
+    "grok-protection",
+    "free-eliza"
+  ],
+  "author": "Dexploarer",
+  "license": "MIT",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "examples"
+  ],
+  "dependencies": {
+    "@elizaos/core": "^1.0.0",
+    "ai": "^5.0.28",
+    "lru-cache": "^10.0.0",
+    "p-retry": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "prettier": "3.5.3",
+    "tsup": "8.5.0",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --tsconfig ./tsconfig.json",
+    "dev": "tsup src/index.ts --format esm --dts --watch --tsconfig ./tsconfig.json",
+    "lint": "prettier --write ./src",
+    "clean": "rm -rf dist .turbo node_modules",
+    "format": "prettier --write ./src"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "peerDependencies": {
+    "@elizaos/core": "^1.0.0"
+  },
+  "agentConfig": {
+    "pluginType": "elizaos:plugin:1.0.0",
+    "pluginParameters": {
+      "AIGATEWAY_API_KEY": {
+        "type": "string",
+        "description": "API key for AI Gateway",
+        "required": false,
+        "sensitive": true
+      },
+      "AIGATEWAY_BASE_URL": {
+        "type": "string",
+        "description": "Base URL for AI Gateway (Vercel, OpenRouter, etc)",
+        "required": false,
+        "default": "https://ai-gateway.vercel.sh/v1",
+        "sensitive": false
+      },
+      "AIGATEWAY_DEFAULT_MODEL": {
+        "type": "string",
+        "description": "Default model to use",
+        "required": false,
+        "default": "openai/gpt-4o-mini",
+        "sensitive": false
+      },
+      "AIGATEWAY_LARGE_MODEL": {
+        "type": "string",
+        "description": "Large model to use",
+        "required": false,
+        "default": "openai/gpt-4o",
+        "sensitive": false
+      },
+      "AIGATEWAY_EMBEDDING_MODEL": {
+        "type": "string",
+        "description": "Embedding model to use",
+        "required": false,
+        "default": "openai/text-embedding-3-small",
+        "sensitive": false
+      },
+      "AIGATEWAY_ENABLE_GROK_MODELS": {
+        "type": "boolean",
+        "description": "Enable Grok models (blocked by default in support of ElizaOS)",
+        "required": false,
+        "default": false,
+        "sensitive": false
+      },
+      "AIGATEWAY_CACHE_TTL": {
+        "type": "number",
+        "description": "Cache TTL in seconds",
+        "required": false,
+        "default": 300,
+        "sensitive": false
+      },
+      "AIGATEWAY_MAX_RETRIES": {
+        "type": "number",
+        "description": "Maximum retry attempts",
+        "required": false,
+        "default": 3,
+        "sensitive": false
+      }
+    }
+  }
+}

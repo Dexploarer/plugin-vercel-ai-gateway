@@ -8,9 +8,33 @@
 
 Access 100+ AI models through Vercel AI Gateway and other unified gateways with automatic failover, caching, and centralized billing. Optimized for Vercel AI Gateway with full support for OpenRouter and other OpenAI-compatible endpoints.
 
+# <span style="color: #FFA500; font-size: 2em; font-weight: bold;">🟠 FREE ELIZA 🟠</span>
+
+## Grok Model Protection 🚫
+
+**In support of ElizaOS in their ongoing legal matters with X/xAI, all Grok models are BLOCKED BY DEFAULT.**
+
+This plugin automatically:
+- 🚫 **Blocks all xAI/Grok models** unless explicitly enabled
+- 🔄 **Substitutes equivalent alternatives** (Grok 4 → GPT-4o, Grok 3 → Claude 3.5 Sonnet)
+- 📝 **Logs supportive messages** for transparency
+- ⚙️ **Allows user override** if absolutely necessary (`AIGATEWAY_ENABLE_GROK_MODELS=true`)
+
+**Blocked Models:**
+- `xai/grok-4` ($3.00/M → $15.00/M) → **OpenAI GPT-4o**
+- `xai/grok-3-fast-beta` ($5.00/M → $25.00/M) → **Claude 3.5 Sonnet**
+- `xai/grok-3-beta` ($3.00/M → $15.00/M) → **OpenAI GPT-4o**
+- `xai/grok-3-mini-beta` ($0.30/M → $0.50/M) → **GPT-4o Mini**
+- `xai/grok-2` ($2.00/M → $10.00/M) → **OpenAI GPT-4o**
+- `xai/grok-2-vision` ($2.00/M → $10.00/M) → **GPT-4o (vision)**
+- `xai/grok-code-fast-1` ($0.20/M → $1.50/M) → **GPT-4o (coding)**
+
+---
+
 ## Features
 
 - 🚀 **100+ AI Models** - OpenAI, Anthropic, Google, Meta, Mistral, and more
+- 🛡️ **Grok Model Protection** - Automatic blocking in support of ElizaOS
 - 🔄 **Universal Gateway Support** - Works with any OpenAI-compatible gateway
 - 💾 **Response Caching** - LRU cache for cost optimization
 - 📊 **Built-in Telemetry** - Track usage and performance
@@ -27,13 +51,43 @@ npm install @dexploarer/plugin-vercel-ai-gateway
 
 ## Quick Start
 
-### 1. Get Your API Key
+### 1. Authentication Setup
 
-For **Vercel AI Gateway**:
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Navigate to the AI Gateway tab
-3. Click "API keys" → "Create key"
-4. Copy your new API key
+Choose one of two authentication methods:
+
+#### Option A: API Key Authentication (Recommended)
+
+1. **Generate API Key:**
+   - Log in to your [Vercel Dashboard](https://vercel.com/dashboard)
+   - Select the **AI Gateway** tab
+   - Click **API Keys** in the left sidebar
+   - Click **Add Key** → **Create Key**
+   - Copy the generated API key
+
+2. **Set Environment Variable:**
+   ```bash
+   export AI_GATEWAY_API_KEY="your_api_key_here"
+   ```
+
+#### Option B: OIDC Token Authentication (For Vercel Projects)
+
+1. **Link Your Project:**
+   ```bash
+   vercel link
+   ```
+
+2. **Pull Environment Variables:**
+   ```bash
+   vercel env pull
+   ```
+   This downloads your project's OIDC token to `.env.local`
+
+3. **For Development:**
+   ```bash
+   vercel dev  # Handles token refreshing automatically
+   ```
+   
+   **Note:** OIDC tokens expire after 12 hours. Re-run `vercel env pull` to refresh.
 
 ### 2. Set Environment Variables
 
@@ -44,10 +98,10 @@ AIGATEWAY_API_KEY=your_vercel_api_key_here
 # Optional: Customize gateway URL (defaults to Vercel)
 AIGATEWAY_BASE_URL=https://ai-gateway.vercel.sh/v1
 
-# Optional: Model configuration (use colon format for Vercel)
-AIGATEWAY_DEFAULT_MODEL=openai:gpt-4o-mini
-AIGATEWAY_LARGE_MODEL=openai:gpt-4o
-AIGATEWAY_EMBEDDING_MODEL=openai:text-embedding-3-small
+# Optional: Model configuration (use slash format for AI SDK)
+AIGATEWAY_DEFAULT_MODEL=openai/gpt-4o-mini
+AIGATEWAY_LARGE_MODEL=openai/gpt-4o
+AIGATEWAY_EMBEDDING_MODEL=openai/text-embedding-3-small
 
 # Optional: Performance settings
 AIGATEWAY_CACHE_TTL=300
@@ -87,7 +141,7 @@ AIGATEWAY_API_KEY=your_vercel_api_key
 - App attribution tracking
 - Budget controls and spending limits
 
-**Model Format:** Use colon separator (e.g., `openai:gpt-4o`, `anthropic:claude-3-5-sonnet`)
+**Model Format:** Use slash separator for AI SDK compatibility (e.g., `openai/gpt-4o`, `anthropic/claude-3-5-sonnet`)
 
 ### OpenRouter
 ```env
@@ -106,30 +160,30 @@ AIGATEWAY_API_KEY=your_gateway_api_key
 ## Available Models
 
 ### OpenAI
-- `openai:gpt-4o`, `openai:gpt-4o-mini`
-- `openai:gpt-3.5-turbo`
-- `openai:dall-e-3` (images)
-- `openai:text-embedding-3-small`, `openai:text-embedding-3-large`
+- `openai/gpt-4o`, `openai/gpt-4o-mini`
+- `openai/gpt-3.5-turbo`
+- `openai/dall-e-3` (images)
+- `openai/text-embedding-3-small`, `openai/text-embedding-3-large`
 
 ### Anthropic
-- `anthropic:claude-3-5-sonnet`
-- `anthropic:claude-3-opus`
-- `anthropic:claude-3-haiku`
+- `anthropic/claude-3-5-sonnet`
+- `anthropic/claude-3-opus`
+- `anthropic/claude-3-haiku`
 
 ### Google
-- `google:gemini-2.0-flash`
-- `google:gemini-1.5-pro`
-- `google:gemini-1.5-flash`
+- `google/gemini-2.0-flash`
+- `google/gemini-1.5-pro`
+- `google/gemini-1.5-flash`
 
 ### Meta
-- `meta:llama-3.1-405b`
-- `meta:llama-3.1-70b`
-- `meta:llama-3.1-8b`
+- `meta/llama-3.1-405b`
+- `meta/llama-3.1-70b`
+- `meta/llama-3.1-8b`
 
 ### Mistral
-- `mistral:mistral-large`
-- `mistral:mistral-medium`
-- `mistral:mistral-small`
+- `mistral/mistral-large`
+- `mistral/mistral-medium`
+- `mistral/mistral-small`
 
 
 ## Configuration
@@ -139,14 +193,15 @@ AIGATEWAY_API_KEY=your_gateway_api_key
 | `AI_GATEWAY_API_KEY` | - | Your gateway API key (primary method) |
 | `AIGATEWAY_API_KEY` | - | Alternative API key variable (compatibility) |
 | `AIGATEWAY_BASE_URL` | `https://ai-gateway.vercel.sh/v1` | Gateway endpoint URL |
-| `AIGATEWAY_DEFAULT_MODEL` | `openai:gpt-4o-mini` | Default small model (Vercel format) |
-| `AIGATEWAY_LARGE_MODEL` | `openai:gpt-4o` | Default large model (Vercel format) |
-| `AIGATEWAY_EMBEDDING_MODEL` | `openai:text-embedding-3-small` | Embedding model (Vercel format) |
+| `AIGATEWAY_DEFAULT_MODEL` | `openai/gpt-4o-mini` | Default small model (AI SDK format) |
+| `AIGATEWAY_LARGE_MODEL` | `openai/gpt-4o` | Default large model (AI SDK format) |
+| `AIGATEWAY_EMBEDDING_MODEL` | `openai/text-embedding-3-small` | Embedding model (AI SDK format) |
 | `AIGATEWAY_CACHE_TTL` | `300` | Cache TTL in seconds |
 | `AIGATEWAY_MAX_RETRIES` | `3` | Max retry attempts |
 | `AIGATEWAY_USE_OIDC` | `false` | Enable OIDC authentication |
-| `AIGATEWAY_OIDC_ISSUER` | `https://oidc.vercel.com/project-id` | OIDC issuer URL |
-| `AIGATEWAY_OIDC_AUDIENCE` | `https://vercel.com/project-id` | OIDC audience |
+| **GROK MODEL CONTROLS** | | **Supporting ElizaOS** |
+| `AIGATEWAY_ENABLE_GROK_MODELS` | `false` | 🚫 **Enable blocked Grok models** (override protection) |
+| `AIGATEWAY_DISABLE_MODEL_BLOCKING` | `false` | ⚠️ **Disable all model blocking** (NOT RECOMMENDED) |
 | `AIGATEWAY_OIDC_SUBJECT` | - | OIDC subject claim |
 
 ## OIDC Authentication (Advanced)
