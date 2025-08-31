@@ -1,13 +1,13 @@
-import { generateText, generateObject as aiGenerateObject, embed } from 'ai';
+import { generateText, generateObject as aiGenerateObject, embed } from "ai";
 import {
   IAgentRuntime,
   GenerateTextParams,
   TextEmbeddingParams,
   ObjectGenerationParams,
   logger,
-} from '@elizaos/core';
-import pRetry from 'p-retry';
-import { CacheService } from '../utils/cache';
+} from "@elizaos/core";
+import pRetry from "p-retry";
+import { CacheService } from "../utils/cache";
 import {
   getApiKey,
   getBaseURL,
@@ -18,11 +18,11 @@ import {
   getCacheTTL,
   useOIDC,
   isModelBlockingDisabled,
-} from '../utils/config';
+} from "../utils/config";
 import {
   validateAndSuggestModel,
   logModelAccess,
-} from '../utils/model-controls';
+} from "../utils/model-controls";
 
 /**
  * Gateway Provider for Vercel AI Gateway with Model Controls
@@ -36,11 +36,58 @@ export class GatewayProvider {
     this.runtime = runtime;
     this.cache = new CacheService(getCacheTTL(runtime));
 
-    logger.info(`[AIGateway] Initializing Gateway Provider with Model Controls`);
+    logger.info(
+      `[AIGateway] Initializing Gateway Provider with Model Controls`,
+    );
     logger.info(`[AIGateway] Base URL: ${getBaseURL(runtime)}`);
     logger.info(`[AIGateway] OIDC enabled: ${useOIDC(runtime)}`);
     logger.info(`[AIGateway] API Key configured: ${!!getApiKey(runtime)}`);
-    logger.info(`[AIGateway] Model blocking disabled: ${isModelBlockingDisabled(runtime)}`);
+    logger.info(
+      `[AIGateway] Model blocking disabled: ${isModelBlockingDisabled(runtime)}`,
+    );
+  }
+
+  /**
+   * Generate streaming text for small models
+   */
+  async generateTextSmallStreaming(
+    runtime: IAgentRuntime,
+    params: GenerateTextParams,
+  ): Promise<AsyncGenerator<string, void, unknown>> {
+    const { StreamingGatewayProvider } = await import(
+      "./streaming-gateway-provider"
+    );
+    const streamingProvider = new StreamingGatewayProvider(runtime);
+    return streamingProvider.generateTextSmallStream(runtime, params);
+  }
+
+  /**
+   * Generate streaming text for large models
+   */
+  async generateTextLargeStreaming(
+    runtime: IAgentRuntime,
+    params: GenerateTextParams,
+  ): Promise<AsyncGenerator<string, void, unknown>> {
+    const { StreamingGatewayProvider } = await import(
+      "./streaming-gateway-provider"
+    );
+    const streamingProvider = new StreamingGatewayProvider(runtime);
+    return streamingProvider.generateTextLargeStream(runtime, params);
+  }
+
+  /**
+   * Generate streaming objects
+   */
+  async generateObjectStreaming(
+    runtime: IAgentRuntime,
+    params: ObjectGenerationParams,
+    modelSize: "small" | "large" = "large",
+  ): Promise<AsyncGenerator<string, void, unknown>> {
+    const { StreamingGatewayProvider } = await import(
+      "./streaming-gateway-provider"
+    );
+    const streamingProvider = new StreamingGatewayProvider(runtime);
+    return streamingProvider.generateObjectStream(runtime, params, modelSize);
   }
 
   /**
@@ -48,7 +95,9 @@ export class GatewayProvider {
    */
   private validateModel(requestedModel: string): string {
     if (isModelBlockingDisabled(this.runtime)) {
-      logger.debug(`[AIGateway] Model blocking disabled, using requested model: ${requestedModel}`);
+      logger.debug(
+        `[AIGateway] Model blocking disabled, using requested model: ${requestedModel}`,
+      );
       return requestedModel;
     }
 
@@ -56,7 +105,9 @@ export class GatewayProvider {
     logModelAccess(requestedModel, !validation.wasBlocked, validation.reason);
 
     if (validation.wasBlocked) {
-      logger.warn(`[AIGateway] Model ${requestedModel} blocked, using ${validation.modelToUse} instead`);
+      logger.warn(
+        `[AIGateway] Model ${requestedModel} blocked, using ${validation.modelToUse} instead`,
+      );
     }
 
     return validation.modelToUse;
@@ -68,14 +119,14 @@ export class GatewayProvider {
   async generateTextSmall(params: GenerateTextParams): Promise<string> {
     const requestedModel = getSmallModel(this.runtime);
     const modelToUse = this.validateModel(requestedModel);
-    
+
     logger.info(`[AIGateway] Using TEXT_SMALL model: ${modelToUse}`);
 
     // Check cache
     const cacheKey = this.cache.generateKey({ model: modelToUse, ...params });
     const cached = this.cache.get<string>(cacheKey);
     if (cached) {
-      logger.debug('[AIGateway] Cache hit for TEXT_SMALL');
+      logger.debug("[AIGateway] Cache hit for TEXT_SMALL");
       return cached;
     }
 
@@ -84,10 +135,13 @@ export class GatewayProvider {
         const messages = [];
 
         if (this.runtime.character?.system) {
-          messages.push({ role: 'system' as const, content: this.runtime.character.system });
+          messages.push({
+            role: "system" as const,
+            content: this.runtime.character.system,
+          });
         }
 
-        messages.push({ role: 'user' as const, content: params.prompt });
+        messages.push({ role: "user" as const, content: params.prompt });
 
         const response = await generateText({
           model: modelToUse as any,
@@ -107,13 +161,13 @@ export class GatewayProvider {
         retries: getMaxRetries(this.runtime),
         onFailedAttempt: (error) => {
           logger.warn(
-            `[AIGateway] TEXT_SMALL attempt ${error.attemptNumber} failed: ${error.message}`
+            `[AIGateway] TEXT_SMALL attempt ${error.attemptNumber} failed: ${error.message}`,
           );
         },
-      }
+      },
     );
 
-    logger.debug('[AIGateway] Caching TEXT_SMALL result');
+    logger.debug("[AIGateway] Caching TEXT_SMALL result");
     this.cache.set(cacheKey, result, getCacheTTL(this.runtime));
 
     return result;
@@ -125,14 +179,14 @@ export class GatewayProvider {
   async generateTextLarge(params: GenerateTextParams): Promise<string> {
     const requestedModel = getLargeModel(this.runtime);
     const modelToUse = this.validateModel(requestedModel);
-    
+
     logger.info(`[AIGateway] Using TEXT_LARGE model: ${modelToUse}`);
 
     // Check cache
     const cacheKey = this.cache.generateKey({ model: modelToUse, ...params });
     const cached = this.cache.get<string>(cacheKey);
     if (cached) {
-      logger.debug('[AIGateway] Cache hit for TEXT_LARGE');
+      logger.debug("[AIGateway] Cache hit for TEXT_LARGE");
       return cached;
     }
 
@@ -141,10 +195,13 @@ export class GatewayProvider {
         const messages = [];
 
         if (this.runtime.character?.system) {
-          messages.push({ role: 'system' as const, content: this.runtime.character.system });
+          messages.push({
+            role: "system" as const,
+            content: this.runtime.character.system,
+          });
         }
 
-        messages.push({ role: 'user' as const, content: params.prompt });
+        messages.push({ role: "user" as const, content: params.prompt });
 
         const response = await generateText({
           model: modelToUse as any,
@@ -164,13 +221,13 @@ export class GatewayProvider {
         retries: getMaxRetries(this.runtime),
         onFailedAttempt: (error) => {
           logger.warn(
-            `[AIGateway] TEXT_LARGE attempt ${error.attemptNumber} failed: ${error.message}`
+            `[AIGateway] TEXT_LARGE attempt ${error.attemptNumber} failed: ${error.message}`,
           );
         },
-      }
+      },
     );
 
-    logger.debug('[AIGateway] Caching TEXT_LARGE result');
+    logger.debug("[AIGateway] Caching TEXT_LARGE result");
     this.cache.set(cacheKey, result, getCacheTTL(this.runtime));
 
     return result;
@@ -182,11 +239,11 @@ export class GatewayProvider {
   async generateEmbedding(params: TextEmbeddingParams): Promise<number[]> {
     const requestedModel = getEmbeddingModel(this.runtime);
     const modelToUse = this.validateModel(requestedModel);
-    
+
     logger.info(`[AIGateway] Using embedding model: ${modelToUse}`);
 
     if (params === null) {
-      logger.debug('[AIGateway] Creating test embedding for initialization');
+      logger.debug("[AIGateway] Creating test embedding for initialization");
       const testVector = Array(1536).fill(0); // Default OpenAI embedding dimension
       return testVector;
     }
@@ -198,7 +255,7 @@ export class GatewayProvider {
     });
     const cached = this.cache.get<number[]>(cacheKey);
     if (cached) {
-      logger.debug('[AIGateway] Cache hit for embedding');
+      logger.debug("[AIGateway] Cache hit for embedding");
       return cached;
     }
 
@@ -215,13 +272,13 @@ export class GatewayProvider {
         retries: getMaxRetries(this.runtime),
         onFailedAttempt: (error) => {
           logger.warn(
-            `[AIGateway] Embedding attempt ${error.attemptNumber} failed: ${error.message}`
+            `[AIGateway] Embedding attempt ${error.attemptNumber} failed: ${error.message}`,
           );
         },
-      }
+      },
     );
 
-    logger.debug('[AIGateway] Caching embedding result');
+    logger.debug("[AIGateway] Caching embedding result");
     this.cache.set(cacheKey, result, getCacheTTL(this.runtime));
 
     return result;
@@ -235,8 +292,12 @@ export class GatewayProvider {
     count?: number;
     size?: string;
   }): Promise<{ url: string; revisedPrompt?: string }[]> {
-    logger.warn('[AIGateway] Image generation not yet implemented for Vercel AI Gateway');
-    throw new Error('Image generation not yet implemented for Vercel AI Gateway');
+    logger.warn(
+      "[AIGateway] Image generation not yet implemented for Vercel AI Gateway",
+    );
+    throw new Error(
+      "Image generation not yet implemented for Vercel AI Gateway",
+    );
   }
 
   /**
@@ -244,7 +305,7 @@ export class GatewayProvider {
    */
   async generateObjectSmall(params: ObjectGenerationParams): Promise<any> {
     logger.warn(
-      '[AIGateway] Object generation not yet fully implemented - falling back to text generation'
+      "[AIGateway] Object generation not yet fully implemented - falling back to text generation",
     );
     const textResult = await this.generateTextSmall({
       prompt: params.prompt,
@@ -264,7 +325,7 @@ export class GatewayProvider {
    */
   async generateObjectLarge(params: ObjectGenerationParams): Promise<any> {
     logger.warn(
-      '[AIGateway] Object generation not yet fully implemented - falling back to text generation'
+      "[AIGateway] Object generation not yet fully implemented - falling back to text generation",
     );
     const textResult = await this.generateTextLarge({
       prompt: params.prompt,

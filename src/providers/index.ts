@@ -1,1 +1,1 @@
-export * from './gateway-provider';
+export * from "./gateway-provider";

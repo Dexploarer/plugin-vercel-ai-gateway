@@ -60,7 +60,9 @@ export function getEmbeddingModel(runtime: IAgentRuntime): string {
  * Get maximum retry attempts
  */
 export function getMaxRetries(runtime: IAgentRuntime): number {
-  const retries = runtime.getSetting("AIGATEWAY_MAX_RETRIES") || process.env.AIGATEWAY_MAX_RETRIES;
+  const retries =
+    runtime.getSetting("AIGATEWAY_MAX_RETRIES") ||
+    process.env.AIGATEWAY_MAX_RETRIES;
   return retries ? parseInt(retries, 10) : 3;
 }
 
@@ -68,7 +70,9 @@ export function getMaxRetries(runtime: IAgentRuntime): number {
  * Get cache TTL in seconds
  */
 export function getCacheTTL(runtime: IAgentRuntime): number {
-  const ttl = runtime.getSetting("AIGATEWAY_CACHE_TTL") || process.env.AIGATEWAY_CACHE_TTL;
+  const ttl =
+    runtime.getSetting("AIGATEWAY_CACHE_TTL") ||
+    process.env.AIGATEWAY_CACHE_TTL;
   return ttl ? parseInt(ttl, 10) : 300;
 }
 
@@ -76,7 +80,8 @@ export function getCacheTTL(runtime: IAgentRuntime): number {
  * Check if OIDC authentication is enabled
  */
 export function useOIDC(runtime: IAgentRuntime): boolean {
-  const oidc = runtime.getSetting("AIGATEWAY_USE_OIDC") || process.env.AIGATEWAY_USE_OIDC;
+  const oidc =
+    runtime.getSetting("AIGATEWAY_USE_OIDC") || process.env.AIGATEWAY_USE_OIDC;
   return oidc === "true" || oidc === true;
 }
 
@@ -84,7 +89,8 @@ export function useOIDC(runtime: IAgentRuntime): boolean {
  * Get request timeout in milliseconds
  */
 export function getTimeout(runtime: IAgentRuntime): number {
-  const timeout = runtime.getSetting("AIGATEWAY_TIMEOUT") || process.env.AIGATEWAY_TIMEOUT;
+  const timeout =
+    runtime.getSetting("AIGATEWAY_TIMEOUT") || process.env.AIGATEWAY_TIMEOUT;
   return timeout ? parseInt(timeout, 10) : 30000;
 }
 
@@ -104,17 +110,9 @@ export function getAppName(runtime: IAgentRuntime): string {
  * Check if Grok models are enabled
  */
 export function areGrokModelsEnabled(runtime: IAgentRuntime): boolean {
-  const enabled = runtime.getSetting("AIGATEWAY_ENABLE_GROK_MODELS") || 
-                  process.env.AIGATEWAY_ENABLE_GROK_MODELS;
-  return enabled === "true" || enabled === true;
-}
-
-/**
- * Check if high-cost models are enabled
- */
-export function areHighCostModelsEnabled(runtime: IAgentRuntime): boolean {
-  const enabled = runtime.getSetting("AIGATEWAY_ENABLE_HIGH_COST_MODELS") || 
-                  process.env.AIGATEWAY_ENABLE_HIGH_COST_MODELS;
+  const enabled =
+    runtime.getSetting("AIGATEWAY_ENABLE_GROK_MODELS") ||
+    process.env.AIGATEWAY_ENABLE_GROK_MODELS;
   return enabled === "true" || enabled === true;
 }
 
@@ -122,8 +120,9 @@ export function areHighCostModelsEnabled(runtime: IAgentRuntime): boolean {
  * Check if model blocking is disabled (for advanced users)
  */
 export function isModelBlockingDisabled(runtime: IAgentRuntime): boolean {
-  const disabled = runtime.getSetting("AIGATEWAY_DISABLE_MODEL_BLOCKING") || 
-                   process.env.AIGATEWAY_DISABLE_MODEL_BLOCKING;
+  const disabled =
+    runtime.getSetting("AIGATEWAY_DISABLE_MODEL_BLOCKING") ||
+    process.env.AIGATEWAY_DISABLE_MODEL_BLOCKING;
   return disabled === "true" || disabled === true;
 }
 
@@ -143,7 +142,6 @@ export function getConfig(runtime: IAgentRuntime) {
     timeout: getTimeout(runtime),
     appName: getAppName(runtime),
     grokModelsEnabled: areGrokModelsEnabled(runtime),
-    highCostModelsEnabled: areHighCostModelsEnabled(runtime),
-    modelBlockingDisabled: isModelBlockingDisabled(runtime)
+    modelBlockingDisabled: isModelBlockingDisabled(runtime),
   };
 }

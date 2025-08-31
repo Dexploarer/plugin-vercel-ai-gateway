@@ -17,7 +17,9 @@ export class CacheService {
       updateAgeOnHas: true,
     });
 
-    logger.debug(`[AIGateway] Cache initialized with TTL: ${ttlSeconds}s, max items: 1000`);
+    logger.debug(
+      `[AIGateway] Cache initialized with TTL: ${ttlSeconds}s, max items: 1000`,
+    );
   }
 
   /**
@@ -30,12 +32,12 @@ export class CacheService {
       // Ensure consistent ordering
       timestamp: Math.floor(Date.now() / (this.ttl / 1000)), // Group by TTL periods
     };
-    
+
     // Remove timestamp for actual key generation to allow grouping
     delete keyData.timestamp;
-    
+
     const key = JSON.stringify(keyData, Object.keys(keyData).sort());
-    return Buffer.from(key).toString('base64').substring(0, 50);
+    return Buffer.from(key).toString("base64").substring(0, 50);
   }
 
   /**
@@ -55,7 +57,9 @@ export class CacheService {
   set<T>(key: string, value: T, ttlSeconds?: number): void {
     const ttl = ttlSeconds ? ttlSeconds * 1000 : this.ttl;
     this.cache.set(key, value, { ttl });
-    logger.debug(`[AIGateway] Cache set for key: ${key.substring(0, 20)}... (TTL: ${ttl/1000}s)`);
+    logger.debug(
+      `[AIGateway] Cache set for key: ${key.substring(0, 20)}... (TTL: ${ttl / 1000}s)`,
+    );
   }
 
   /**
@@ -71,7 +75,9 @@ export class CacheService {
   delete(key: string): boolean {
     const deleted = this.cache.delete(key);
     if (deleted) {
-      logger.debug(`[AIGateway] Cache deleted for key: ${key.substring(0, 20)}...`);
+      logger.debug(
+        `[AIGateway] Cache deleted for key: ${key.substring(0, 20)}...`,
+      );
     }
     return deleted;
   }
@@ -101,6 +107,8 @@ export class CacheService {
    */
   logStats(): void {
     const stats = this.getStats();
-    logger.info(`[AIGateway] Cache stats: ${stats.size}/${stats.max} items, TTL: ${stats.ttl}s`);
+    logger.info(
+      `[AIGateway] Cache stats: ${stats.size}/${stats.max} items, TTL: ${stats.ttl}s`,
+    );
   }
 }
