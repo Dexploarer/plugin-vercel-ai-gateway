@@ -261,8 +261,11 @@ export class GatewayProvider {
           baseURL: getBaseURL(this.runtime),
         });
         
+        // Strip provider prefix for AI Gateway compatibility
+        const modelName = modelToUse.replace(/^openai\//, '');
+        
         const response = await embed({
-          model: provider.textEmbeddingModel(modelToUse),
+          model: provider.textEmbeddingModel(modelName),
           value: params.text,
         });
 
