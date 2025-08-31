@@ -1,7 +1,7 @@
 import {
   GatewayProvider,
   __name
-} from "./chunk-Y6IT5ITV.js";
+} from "./chunk-52BKA4FN.js";
 
 // src/index.ts
 import { ModelType, logger } from "@elizaos/core";

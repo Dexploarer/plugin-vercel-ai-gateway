@@ -262,7 +262,40 @@ export class GatewayProvider {
     const result = await pRetry(
       async () => {
         const response = await embed({
-          model: modelToUse as any,
+          model: {
+            modelId: modelToUse,
+            specificationVersion: 'v1',
+            provider: 'aigateway',
+            maxEmbeddingsPerCall: 1,
+            supportsParallelCalls: false,
+            doEmbed: async ({ values, headers, abortSignal }) => {
+              const apiKey = getApiKey(this.runtime);
+              const baseURL = getBaseURL(this.runtime);
+              
+              const response = await fetch(`${baseURL}/embeddings`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${apiKey}`,
+                  ...headers,
+                },
+                body: JSON.stringify({
+                  model: modelToUse,
+                  input: values[0],
+                }),
+                signal: abortSignal,
+              });
+
+              if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+              }
+
+              const data = await response.json();
+              return {
+                embeddings: [data.data[0].embedding],
+              };
+            },
+          },
           value: params.text,
         });
 
