@@ -344,6 +344,8 @@ export class GatewayProvider {
       prompt: params.prompt,
       temperature: params.temperature,
       maxTokens: 2048,
+      runtime: this.runtime,
+      modelType: 'TEXT_SMALL' as any,
     });
 
     try {
@@ -364,6 +366,8 @@ export class GatewayProvider {
       prompt: params.prompt,
       temperature: params.temperature,
       maxTokens: 4096,
+      runtime: this.runtime,
+      modelType: 'TEXT_LARGE' as any,
     });
 
     try {
