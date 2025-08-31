@@ -256,9 +256,42 @@ export class GatewayProvider {
         
         logger.info(`[AIGateway] Embedding request - Model: ${modelToUse}, Text: "${params.text}"`);
         
-        // Use AI Gateway with string model specification
+        // Create embedding model directly
+        const embeddingModel = {
+          modelId: modelToUse,
+          specificationVersion: 'v1' as const,
+          provider: 'aigateway',
+          maxEmbeddingsPerCall: 1,
+          supportsParallelCalls: false,
+          doEmbed: async ({ values, headers, abortSignal }: any) => {
+            const response = await fetch(`${getBaseURL(this.runtime)}/embeddings`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getApiKey(this.runtime)}`,
+                ...headers,
+              },
+              body: JSON.stringify({
+                model: modelToUse,
+                input: values[0],
+              }),
+              signal: abortSignal,
+            });
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+
+            const data = await response.json();
+            return {
+              embeddings: [data.data[0].embedding],
+            };
+          },
+        };
+        
         const response = await embed({
-          model: modelToUse,
+          model: embeddingModel,
           value: params.text,
         });
 
