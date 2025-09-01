@@ -1,4 +1,4 @@
-import { generateText, generateObject as aiGenerateObject, embed } from "ai";
+import { generateText, embed } from "ai";
 import {
   IAgentRuntime,
   GenerateTextParams,
@@ -252,7 +252,6 @@ export class GatewayProvider {
 
     const result = await pRetry(
       async () => {
-        const { embed } = await import("ai");
 
         logger.info(
           `[AIGateway] Embedding request - Model: ${modelToUse}, Text: "${params.text}"`,

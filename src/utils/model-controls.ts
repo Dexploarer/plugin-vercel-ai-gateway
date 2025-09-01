@@ -1,4 +1,5 @@
 import { logger } from "@elizaos/core";
+import { areGrokModelsEnabled as configAreGrokModelsEnabled } from "./config";
 
 /**
  * Grok model identifiers - BLOCKED BY DEFAULT
@@ -53,8 +54,13 @@ export function isGrokModel(modelName: string): boolean {
  * Check if Grok models are specifically enabled by the user
  */
 export function areGrokModelsEnabled(runtime: any): boolean {
-  const grokEnabled = runtime.getSetting("AIGATEWAY_ENABLE_GROK_MODELS");
-  return grokEnabled === "true" || grokEnabled === true;
+  // Delegate to unified config helper (supports both env var variants)
+  try {
+    return configAreGrokModelsEnabled(runtime as any);
+  } catch {
+    const grokEnabled = runtime?.getSetting?.("AIGATEWAY_ENABLE_GROK_MODELS");
+    return grokEnabled === "true" || grokEnabled === true;
+  }
 }
 
 /**

@@ -20,8 +20,8 @@ function getSetting(
  */
 export function getApiKey(runtime: IAgentRuntime): string | undefined {
   return (
-    getSetting(runtime, "AI_GATEWAY_API_KEY") ||
     getSetting(runtime, "AIGATEWAY_API_KEY") ||
+    getSetting(runtime, "AI_GATEWAY_API_KEY") ||
     undefined
   );
 }

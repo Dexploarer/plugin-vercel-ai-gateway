@@ -1,6 +1,5 @@
 import { IAgentRuntime, Plugin, ModelType, logger } from "@elizaos/core";
-import { GatewayProvider } from "./providers/gateway-provider.js";
-import { getConfig } from "./utils/config.js";
+import { GatewayProvider } from "./providers/gateway-provider";
 
 const plugin: Plugin = {
   name: "aigateway",

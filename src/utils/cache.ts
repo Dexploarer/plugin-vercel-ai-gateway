@@ -26,17 +26,8 @@ export class CacheService {
    * Generate a cache key from parameters
    */
   generateKey(params: any): string {
-    // Create a stable key from the parameters
-    const keyData = {
-      ...params,
-      // Ensure consistent ordering
-      timestamp: Math.floor(Date.now() / (this.ttl / 1000)), // Group by TTL periods
-    };
-
-    // Remove timestamp for actual key generation to allow grouping
-    delete keyData.timestamp;
-
-    const key = JSON.stringify(keyData, Object.keys(keyData).sort());
+    // Create a stable key from the parameters (order-insensitive)
+    const key = JSON.stringify(params, Object.keys(params).sort());
     return Buffer.from(key).toString("base64").substring(0, 50);
   }
 
