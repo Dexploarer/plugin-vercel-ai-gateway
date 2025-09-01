@@ -1,5 +1,5 @@
 import { IAgentRuntime, Route, ModelType, logger } from "@elizaos/core";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { getConfig } from "../utils/config";
 import { applyModelControls } from "../utils/model-controls";
 // Removed processUploadedFile import - not available in current server version
@@ -462,6 +462,12 @@ export const openaiRoutes: Route[] = [
   {
     type: "POST",
     path: "/v1/chat/completions",
+    handler: chatCompletions,
+  },
+  // Alias for simple send semantics
+  {
+    type: "POST",
+    path: "/v1/send",
     handler: chatCompletions,
   },
   {

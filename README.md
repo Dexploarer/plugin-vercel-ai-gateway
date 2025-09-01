@@ -36,6 +36,7 @@ This plugin automatically:
 - 🚀 **100+ AI Models** - OpenAI, Anthropic, Google, Meta, Mistral, and more
 - 🛡️ **Grok Model Protection** - Automatic blocking in support of ElizaOS
 - 🔄 **Universal Gateway Support** - Works with any OpenAI-compatible gateway
+- 🧩 **Central Channel Compat** - Optional routes to ensure agent participation and post replies
 - 💾 **Response Caching** - LRU cache for cost optimization
 - 📊 **Built-in Telemetry** - Track usage and performance
 - 🔐 **Flexible Authentication** - API keys and OIDC support
@@ -428,6 +429,34 @@ const images = await runtime.useModel(ModelType.IMAGE, {
 });
 ```
 
+### Direct Client Usage
+
+For simple probes or service checks, you can call the gateway directly without booting ElizaOS by using the exported client:
+
+```ts
+import 'dotenv/config';
+import { createGatewayClient } from '@dexploarer/plugin-vercel-ai-gateway';
+
+const gw = createGatewayClient(); // uses AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN
+
+// Embeddings
+const { vectors, dim } = await gw.embeddings({
+  input: ['hello', 'world'],
+  model: process.env.ELIZA_EMBEDDINGS_MODEL || 'text-embedding-3-small',
+});
+
+// Chat
+const out = await gw.chat({
+  model: process.env.ELIZA_CHAT_MODEL || 'gpt-4o-mini',
+  messages: [{ role: 'user', content: 'ping' }],
+});
+console.log(out.text);
+```
+
+Environment resolution order for auth:
+- `AI_GATEWAY_API_KEY` (or `AIGATEWAY_API_KEY`)
+- `VERCEL_OIDC_TOKEN` (from `vercel env pull`)
+
 ## Testing
 
 ```bash
@@ -476,3 +505,44 @@ MIT © elizaOS Community
 For issues and questions:
 - GitHub Issues: [plugin-vercel-ai-gateway/issues](https://github.com/Dexploarer/plugin-vercel-ai-gateway/issues)
 - Discord: [elizaOS Community](https://discord.gg/elizaos)
+## Central Channel Compatibility (Ops)
+
+For reliable central‑channel message handling in production, the plugin provides optional routes that explicitly ensure agent participation and post assistant replies through your Gateway. Enable them with an internal token for safety.
+
+Environment:
+- `AIGATEWAY_ENABLE_CENTRAL_ROUTES` (default: `true`)
+- `AIGATEWAY_INTERNAL_TOKEN` (recommended) — use `Authorization: Bearer <token>` header for these routes
+- `AIGATEWAY_CENTRAL_RATE_LIMIT_PER_MIN` (default: `60`)
+
+Routes:
+- `POST /v1/central/channels/:channelId/ensure-agent`
+  - Ensures the running agent is a participant of the central channel
+  - Response `{ success, reqId, data: { channelId, agentId } }` with `X-Request-Id` header
+- `POST /v1/central/channels/:channelId/reply`
+  - Body: `{ prompt: string, modelSize?: "small" | "large" }`
+  - Generates via Gateway, posts assistant message to central
+  - Response `{ success, reqId, data: { message, central } }`
+- `POST /v1/central/channels/:channelId/reply/stream`
+  - Body: `{ prompt: string, modelSize?: "small" | "large", maxTokens?: number }`
+  - SSE stream of token events; posts final message on completion
+
+Examples:
+```bash
+TOKEN=your-internal-token
+CHANNEL_ID=00000000-0000-0000-0000-000000000000
+
+curl -s -X POST "http://localhost:3000/v1/central/channels/$CHANNEL_ID/ensure-agent" \
+  -H "Authorization: Bearer $TOKEN" | jq
+
+curl -s -X POST "http://localhost:3000/v1/central/channels/$CHANNEL_ID/reply" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Say hello and include: gateway","modelSize":"small"}' | jq
+
+curl -N -X POST "http://localhost:3000/v1/central/channels/$CHANNEL_ID/reply/stream" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Explain streaming in two sentences"}'
+```
+
+All responses include an `X-Request-Id` header and `reqId` field for traceability. The plugin logs are structured and include request IDs.

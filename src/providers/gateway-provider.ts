@@ -1,4 +1,5 @@
-import { generateText, embed } from "ai";
+import { generateText, generateObject as aiGenerateObject, embed } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
 import {
   IAgentRuntime,
   GenerateTextParams,
@@ -132,7 +133,7 @@ export class GatewayProvider {
 
     const result = await pRetry(
       async () => {
-        const messages = [];
+        const messages: { role: "system" | "user" | "assistant"; content: string }[] = [];
 
         if (this.runtime.character?.system) {
           messages.push({
@@ -143,9 +144,16 @@ export class GatewayProvider {
 
         messages.push({ role: "user" as const, content: params.prompt });
 
+        const openai = createOpenAI({
+          apiKey: getApiKey(this.runtime),
+          baseURL: getBaseURL(this.runtime),
+        });
+        const smallId = modelToUse.includes("/") ? modelToUse.split("/")[1] : modelToUse;
+        const smallModel = openai(smallId);
+
         const response = await generateText({
-          model: modelToUse as any,
-          messages: messages as any,
+          model: smallModel as any,
+          messages,
           temperature: params.temperature ?? 0.7,
           maxTokens: params.maxTokens ?? 2048,
           frequencyPenalty: params.frequencyPenalty ?? 0.7,
@@ -192,7 +200,7 @@ export class GatewayProvider {
 
     const result = await pRetry(
       async () => {
-        const messages = [];
+        const messages: { role: "system" | "user" | "assistant"; content: string }[] = [];
 
         if (this.runtime.character?.system) {
           messages.push({
@@ -203,9 +211,16 @@ export class GatewayProvider {
 
         messages.push({ role: "user" as const, content: params.prompt });
 
+        const openai = createOpenAI({
+          apiKey: getApiKey(this.runtime),
+          baseURL: getBaseURL(this.runtime),
+        });
+        const largeId = modelToUse.includes("/") ? modelToUse.split("/")[1] : modelToUse;
+        const largeModel = openai(largeId);
+
         const response = await generateText({
-          model: modelToUse as any,
-          messages: messages as any,
+          model: largeModel as any,
+          messages,
           temperature: params.temperature ?? 0.7,
           maxTokens: params.maxTokens ?? 4096,
           frequencyPenalty: params.frequencyPenalty ?? 0.7,
@@ -265,22 +280,20 @@ export class GatewayProvider {
           maxEmbeddingsPerCall: 1,
           supportsParallelCalls: false,
           doEmbed: async ({ values, headers, abortSignal }: any) => {
-            const response = await fetch(
-              `${getBaseURL(this.runtime)}/embeddings`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${getApiKey(this.runtime)}`,
-                  ...headers,
-                },
-                body: JSON.stringify({
-                  model: modelToUse,
-                  input: values[0],
-                }),
-                signal: abortSignal,
+            const token = getApiKey(this.runtime) || process.env.VERCEL_OIDC_TOKEN;
+            const response = await fetch(`${getBaseURL(this.runtime)}/embeddings`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                ...headers,
               },
-            );
+              body: JSON.stringify({
+                model: modelToUse,
+                input: values[0],
+              }),
+              signal: abortSignal,
+            });
 
             if (!response.ok) {
               const errorText = await response.text();

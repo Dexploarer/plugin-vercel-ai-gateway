@@ -4,7 +4,7 @@ import {
   SOCKET_MESSAGE_TYPE,
   logger,
 } from "@elizaos/core";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { StreamingGatewayProvider } from "../providers/streaming-gateway-provider";
 import { getConfig } from "../utils/config";
 import { applyModelControls } from "../utils/model-controls";
@@ -124,13 +124,16 @@ async function handleSocketIOStreaming(
     const io = serverInstance.io;
 
     // Send initial thinking message
-    io.to(roomId).emit("messageBroadcast", {
+    const thinkingPayload = {
       type: SOCKET_MESSAGE_TYPE.THINKING,
       streamId,
       roomId,
       status: "processing",
       timestamp: Date.now(),
-    });
+    };
+    // Emit on both legacy and standard channels for compatibility
+    io.to(roomId).emit("messageBroadcast", thinkingPayload);
+    io.to(roomId).emit("message", thinkingPayload);
 
     const streamingProvider = new StreamingGatewayProvider(runtime);
 
@@ -157,7 +160,7 @@ async function handleSocketIOStreaming(
       chunkIndex++;
 
       // Emit streaming chunk
-      io.to(roomId).emit("messageBroadcast", {
+      const chunkPayload = {
         type: SOCKET_MESSAGE_TYPE.MESSAGE,
         streamId,
         roomId,
@@ -168,14 +171,16 @@ async function handleSocketIOStreaming(
           is_streaming: true,
         },
         timestamp: Date.now(),
-      });
+      };
+      io.to(roomId).emit("messageBroadcast", chunkPayload);
+      io.to(roomId).emit("message", chunkPayload);
 
       // Small delay to prevent overwhelming the client
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
 
     // Send completion message
-    io.to(roomId).emit("messageBroadcast", {
+    const completePayload = {
       type: SOCKET_MESSAGE_TYPE.MESSAGE,
       streamId,
       roomId,
@@ -187,7 +192,9 @@ async function handleSocketIOStreaming(
       },
       timestamp: Date.now(),
       finish_reason: "stop",
-    });
+    };
+    io.to(roomId).emit("messageBroadcast", completePayload);
+    io.to(roomId).emit("message", completePayload);
 
     logger.info(
       `[AIGateway] Completed Socket.IO stream ${streamId} with ${chunkIndex} chunks`,
@@ -202,7 +209,7 @@ async function handleSocketIOStreaming(
     try {
       const serverInstance = (runtime as any).serverInstance;
       if (serverInstance?.io) {
-        serverInstance.io.to(roomId).emit("messageBroadcast", {
+        const errorPayload = {
           type: SOCKET_MESSAGE_TYPE.MESSAGE,
           streamId,
           roomId,
@@ -211,7 +218,9 @@ async function handleSocketIOStreaming(
             type: "internal_error",
           },
           timestamp: Date.now(),
-        });
+        };
+        serverInstance.io.to(roomId).emit("messageBroadcast", errorPayload);
+        serverInstance.io.to(roomId).emit("message", errorPayload);
       }
     } catch (errorEmitError) {
       logger.error("[AIGateway] Failed to emit error message:", errorEmitError);
