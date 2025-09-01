@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+bun.lockb
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OpenAI API keys
+*.key
+api_keys.txt
+
+# Generated content
+output/scraped-content/
+deepwiki_eliza_links.txt
+elizaos_categorization.md
+elizaos_summary.md
+EXECUTION_SUMMARY.md
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Backup files
+*.backup
+*.bak
+*.orig

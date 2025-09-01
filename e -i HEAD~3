@@ -1,0 +1,10 @@
+[33m8543c28[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32minfo[m[33m)[m .
+[33m1fc953e[m refactor: Enhance project structure and update TypeScript configurations
+[33mf0c2821[m refactor: Update project structure and dependencies for deepwiki-crawl
+[33m06cc7d2[m[33m ([m[1;31morigin/no-frontend-v2[m[33m, [m[1;31morigin/info[m[33m, [m[1;32mno-frontend-v2[m[33m)[m feat: Implement production-safe receive handler with proper types and security
+[33m2663523[m fix: Resolve TypeScript errors in receive handler
+[33m985a1a4[m cleanup: Remove unused tool-calls action file
+[33m36870d0[m fix: Simplify receive handler to avoid complex TypeScript issues
+[33m7145a1e[m fix: Update character file to use local plugin path and fix TypeScript issues
+[33m77dbc00[m feat: Add ElizaOS native receive and send handlers for webhook integration
+[33m3c13d6d[m fix: Apply comprehensive fixes for plugin stability and consistency

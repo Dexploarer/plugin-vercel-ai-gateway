@@ -1,0 +1,111 @@
+# Server & Infrastructure - LLM Context
+
+## Overview
+This file provides context for Large Language Models working with server & infrastructure in developer context.
+
+## Context Information
+
+### Domain: Server & Infrastructure
+- **Primary Focus**: server & infrastructure development and management
+- **Context**: developer context
+- **Scope**: Technical implementation and best practices
+
+### Key Concepts
+- System architecture and design patterns
+- Development workflows and processes
+- Performance optimization strategies
+- Security and compliance requirements
+- Integration with other systems
+
+### Technical Stack
+- Programming languages and frameworks
+- Database systems and data models
+- API design and implementation
+- Testing and quality assurance
+- Deployment and infrastructure
+
+## Common Tasks
+
+### Development Tasks
+1. **Code Implementation**
+   - Write clean, maintainable code
+   - Follow established patterns
+   - Implement error handling
+   - Add comprehensive tests
+
+2. **System Design**
+   - Design scalable architectures
+   - Plan data structures
+   - Define API contracts
+   - Consider security implications
+
+3. **Integration**
+   - Connect with external systems
+   - Implement data flows
+   - Handle authentication
+   - Manage dependencies
+
+### Analysis Tasks
+1. **Performance Analysis**
+   - Identify bottlenecks
+   - Optimize critical paths
+   - Monitor resource usage
+   - Plan capacity
+
+2. **Security Review**
+   - Audit access controls
+   - Review data handling
+   - Check for vulnerabilities
+   - Validate compliance
+
+3. **Code Review**
+   - Check code quality
+   - Verify best practices
+   - Ensure documentation
+   - Validate testing
+
+## Guidelines for AI Assistance
+
+### When Providing Code
+- Use TypeScript/JavaScript for web development
+- Follow established naming conventions
+- Include proper error handling
+- Add JSDoc comments
+- Write unit tests
+
+### When Analyzing Problems
+- Consider system architecture
+- Review error logs
+- Check configuration
+- Validate assumptions
+- Suggest improvements
+
+### When Making Recommendations
+- Consider scalability
+- Evaluate security implications
+- Assess maintainability
+- Review performance impact
+- Check compatibility
+
+## Reference Information
+
+### Documentation Structure
+- README files for overview
+- API documentation for interfaces
+- Code comments for implementation
+- Architecture docs for design
+- Workflow docs for processes
+
+### Quality Standards
+- Code coverage requirements
+- Performance benchmarks
+- Security compliance
+- Documentation completeness
+- Testing requirements
+
+### Best Practices
+- Modular design
+- Error handling
+- Logging and monitoring
+- Security by design
+- Performance optimization
