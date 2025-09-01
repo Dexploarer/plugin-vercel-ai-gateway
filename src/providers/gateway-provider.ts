@@ -252,31 +252,36 @@ export class GatewayProvider {
 
     const result = await pRetry(
       async () => {
-        const { embed } = await import('ai');
-        
-        logger.info(`[AIGateway] Embedding request - Model: ${modelToUse}, Text: "${params.text}"`);
-        
+        const { embed } = await import("ai");
+
+        logger.info(
+          `[AIGateway] Embedding request - Model: ${modelToUse}, Text: "${params.text}"`,
+        );
+
         // Create embedding model directly
         const embeddingModel = {
           modelId: modelToUse,
-          specificationVersion: 'v1' as const,
-          provider: 'aigateway',
+          specificationVersion: "v1" as const,
+          provider: "aigateway",
           maxEmbeddingsPerCall: 1,
           supportsParallelCalls: false,
           doEmbed: async ({ values, headers, abortSignal }: any) => {
-            const response = await fetch(`${getBaseURL(this.runtime)}/embeddings`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getApiKey(this.runtime)}`,
-                ...headers,
+            const response = await fetch(
+              `${getBaseURL(this.runtime)}/embeddings`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${getApiKey(this.runtime)}`,
+                  ...headers,
+                },
+                body: JSON.stringify({
+                  model: modelToUse,
+                  input: values[0],
+                }),
+                signal: abortSignal,
               },
-              body: JSON.stringify({
-                model: modelToUse,
-                input: values[0],
-              }),
-              signal: abortSignal,
-            });
+            );
 
             if (!response.ok) {
               const errorText = await response.text();
@@ -289,7 +294,7 @@ export class GatewayProvider {
             };
           },
         };
-        
+
         const response = await embed({
           model: embeddingModel,
           value: params.text,
@@ -341,7 +346,7 @@ export class GatewayProvider {
       temperature: params.temperature,
       maxTokens: 2048,
       runtime: this.runtime,
-      modelType: 'TEXT_SMALL' as any,
+      modelType: "TEXT_SMALL" as any,
     });
 
     try {
@@ -363,7 +368,7 @@ export class GatewayProvider {
       temperature: params.temperature,
       maxTokens: 4096,
       runtime: this.runtime,
-      modelType: 'TEXT_LARGE' as any,
+      modelType: "TEXT_LARGE" as any,
     });
 
     try {

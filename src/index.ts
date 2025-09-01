@@ -51,11 +51,11 @@ const plugin: Plugin = {
       }
       const provider = new GatewayProvider(params.runtime);
       return provider.generateObjectLarge(params);
-    }
+    },
   },
   init: async (config: Record<string, string>, runtime: IAgentRuntime) => {
     logger.info("[AIGateway] Plugin initialized with models export structure");
-  }
+  },
 };
 
 export default plugin;

@@ -6,10 +6,10 @@ import { IAgentRuntime } from "@elizaos/core";
 function getSetting(
   runtime: IAgentRuntime,
   key: string,
-  defaultValue?: string
+  defaultValue?: string,
 ): string | undefined {
   // Handle case where runtime might not have getSetting method
-  if (runtime && typeof runtime.getSetting === 'function') {
+  if (runtime && typeof runtime.getSetting === "function") {
     return runtime.getSetting(key) ?? process.env[key] ?? defaultValue;
   }
   return process.env[key] ?? defaultValue;
@@ -30,7 +30,11 @@ export function getApiKey(runtime: IAgentRuntime): string | undefined {
  * Get base URL for the gateway
  */
 export function getBaseURL(runtime: IAgentRuntime): string {
-  return getSetting(runtime, "AI_GATEWAY_BASE_URL", "https://ai-gateway.vercel.sh/v1")!;
+  return getSetting(
+    runtime,
+    "AI_GATEWAY_BASE_URL",
+    "https://ai-gateway.vercel.sh/v1",
+  )!;
 }
 
 /**
@@ -51,7 +55,11 @@ export function getLargeModel(runtime: IAgentRuntime): string {
  * Get embedding model
  */
 export function getEmbeddingModel(runtime: IAgentRuntime): string {
-  return getSetting(runtime, "AI_GATEWAY_EMBEDDING_MODEL", "openai/text-embedding-3-small")!;
+  return getSetting(
+    runtime,
+    "AI_GATEWAY_EMBEDDING_MODEL",
+    "openai/text-embedding-3-small",
+  )!;
 }
 
 /**

@@ -61,7 +61,10 @@ async function listModels(
       data: modelList,
     });
   } catch (error) {
-    logger.error("[AIGateway] Error listing models:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error listing models:",
+      error instanceof Error ? error.message : String(error),
+    );
     res.status(500).json({
       error: {
         message: "Internal server error",
@@ -198,7 +201,12 @@ async function chatCompletions(
         res.write("data: [DONE]\n\n");
         res.end();
       } catch (streamError) {
-        logger.error("[AIGateway] Error in streaming:", streamError instanceof Error ? streamError.message : String(streamError));
+        logger.error(
+          "[AIGateway] Error in streaming:",
+          streamError instanceof Error
+            ? streamError.message
+            : String(streamError),
+        );
         res.write(
           `data: {"error": {"message": "Streaming failed", "type": "internal_error"}}\n\n`,
         );
@@ -228,7 +236,10 @@ async function chatCompletions(
       });
     }
   } catch (error) {
-    logger.error("[AIGateway] Error in chat completions:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error in chat completions:",
+      error instanceof Error ? error.message : String(error),
+    );
     res.status(500).json({
       error: {
         message: "Internal server error",
@@ -284,7 +295,10 @@ async function createEmbeddings(
       },
     });
   } catch (error) {
-    logger.error("[AIGateway] Error creating embeddings:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error creating embeddings:",
+      error instanceof Error ? error.message : String(error),
+    );
     res.status(500).json({
       error: {
         message: "Internal server error",
@@ -365,7 +379,7 @@ async function processImageUrl(
         filename: mockFile.originalname,
         url: `data:${mimeType};base64,${base64Data}`,
         size: buffer.length,
-        type: mimeType
+        type: mimeType,
       };
       return result;
     } else if (url.startsWith("http")) {
@@ -376,7 +390,10 @@ async function processImageUrl(
 
     return null;
   } catch (error) {
-    logger.error("[AIGateway] Error processing image URL:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error processing image URL:",
+      error instanceof Error ? error.message : String(error),
+    );
     return null;
   }
 }
@@ -384,7 +401,11 @@ async function processImageUrl(
 /**
  * POST /v1/files - File upload endpoint
  */
-async function uploadFile(req: Request, res: Response, runtime: IAgentRuntime): Promise<void> {
+async function uploadFile(
+  req: Request,
+  res: Response,
+  runtime: IAgentRuntime,
+): Promise<void> {
   try {
     const file = req.file;
     if (!file) {
@@ -402,7 +423,7 @@ async function uploadFile(req: Request, res: Response, runtime: IAgentRuntime): 
       filename: file.originalname,
       url: `/uploads/${Date.now()}-${file.originalname}`,
       size: file.size,
-      type: file.mimetype
+      type: file.mimetype,
     };
 
     res.json({
@@ -416,7 +437,10 @@ async function uploadFile(req: Request, res: Response, runtime: IAgentRuntime): 
       url: result.url,
     });
   } catch (error) {
-    logger.error("[AIGateway] Error uploading file:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error uploading file:",
+      error instanceof Error ? error.message : String(error),
+    );
     res.status(500).json({
       error: {
         message: "File upload failed",
