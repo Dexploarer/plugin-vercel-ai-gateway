@@ -30,35 +30,35 @@ export function getApiKey(runtime: IAgentRuntime): string | undefined {
  * Get base URL for the gateway
  */
 export function getBaseURL(runtime: IAgentRuntime): string {
-  return getSetting(runtime, "AIGATEWAY_BASE_URL", "https://ai-gateway.vercel.sh/v1")!;
+  return getSetting(runtime, "AI_GATEWAY_BASE_URL", "https://ai-gateway.vercel.sh/v1")!;
 }
 
 /**
  * Get default small model
  */
 export function getSmallModel(runtime: IAgentRuntime): string {
-  return getSetting(runtime, "AIGATEWAY_DEFAULT_MODEL", "openai/gpt-4o-mini")!;
+  return getSetting(runtime, "AI_GATEWAY_DEFAULT_MODEL", "openai/gpt-4o-mini")!;
 }
 
 /**
  * Get large model for complex tasks
  */
 export function getLargeModel(runtime: IAgentRuntime): string {
-  return getSetting(runtime, "AIGATEWAY_LARGE_MODEL", "openai/gpt-4o")!;
+  return getSetting(runtime, "AI_GATEWAY_LARGE_MODEL", "openai/gpt-4o")!;
 }
 
 /**
  * Get embedding model
  */
 export function getEmbeddingModel(runtime: IAgentRuntime): string {
-  return getSetting(runtime, "AIGATEWAY_EMBEDDING_MODEL", "openai/text-embedding-3-small")!;
+  return getSetting(runtime, "AI_GATEWAY_EMBEDDING_MODEL", "openai/text-embedding-3-small")!;
 }
 
 /**
  * Get maximum retry attempts
  */
 export function getMaxRetries(runtime: IAgentRuntime): number {
-  const retries = getSetting(runtime, "AIGATEWAY_MAX_RETRIES");
+  const retries = getSetting(runtime, "AI_GATEWAY_MAX_RETRIES");
   const parsed = retries ? parseInt(retries, 10) : NaN;
   return !isNaN(parsed) ? parsed : 3;
 }
@@ -67,7 +67,7 @@ export function getMaxRetries(runtime: IAgentRuntime): number {
  * Get cache TTL in seconds
  */
 export function getCacheTTL(runtime: IAgentRuntime): number {
-  const ttl = getSetting(runtime, "AIGATEWAY_CACHE_TTL");
+  const ttl = getSetting(runtime, "AI_GATEWAY_CACHE_TTL");
   const parsed = ttl ? parseInt(ttl, 10) : NaN;
   return !isNaN(parsed) ? parsed : 300;
 }
@@ -76,7 +76,7 @@ export function getCacheTTL(runtime: IAgentRuntime): number {
  * Check if OIDC authentication is enabled
  */
 export function useOIDC(runtime: IAgentRuntime): boolean {
-  const oidc = getSetting(runtime, "AIGATEWAY_USE_OIDC");
+  const oidc = getSetting(runtime, "AI_GATEWAY_USE_OIDC");
   return oidc === "true" || oidc === "1";
 }
 
@@ -84,7 +84,7 @@ export function useOIDC(runtime: IAgentRuntime): boolean {
  * Get request timeout in milliseconds
  */
 export function getTimeout(runtime: IAgentRuntime): number {
-  const timeout = getSetting(runtime, "AIGATEWAY_TIMEOUT");
+  const timeout = getSetting(runtime, "AI_GATEWAY_TIMEOUT");
   const parsed = timeout ? parseInt(timeout, 10) : NaN;
   return !isNaN(parsed) ? parsed : 30000;
 }
@@ -94,7 +94,7 @@ export function getTimeout(runtime: IAgentRuntime): number {
  */
 export function getAppName(runtime: IAgentRuntime): string {
   return (
-    getSetting(runtime, "AIGATEWAY_APP_NAME") ||
+    getSetting(runtime, "AI_GATEWAY_APP_NAME") ||
     runtime.character?.name ||
     "ElizaOS-Agent"
   );
@@ -104,7 +104,7 @@ export function getAppName(runtime: IAgentRuntime): string {
  * Check if Grok models are enabled
  */
 export function areGrokModelsEnabled(runtime: IAgentRuntime): boolean {
-  const enabled = getSetting(runtime, "AIGATEWAY_ENABLE_GROK_MODELS");
+  const enabled = getSetting(runtime, "AI_GATEWAY_ENABLE_GROK_MODELS");
   return enabled === "true" || enabled === "1";
 }
 
@@ -112,7 +112,7 @@ export function areGrokModelsEnabled(runtime: IAgentRuntime): boolean {
  * Check if model blocking is disabled (for advanced users)
  */
 export function isModelBlockingDisabled(runtime: IAgentRuntime): boolean {
-  const disabled = getSetting(runtime, "AIGATEWAY_DISABLE_MODEL_BLOCKING");
+  const disabled = getSetting(runtime, "AI_GATEWAY_DISABLE_MODEL_BLOCKING");
   return disabled === "true" || disabled === "1";
 }
 
