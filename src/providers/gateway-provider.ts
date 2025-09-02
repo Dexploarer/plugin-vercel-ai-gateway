@@ -6,6 +6,8 @@ import {
   TextEmbeddingParams,
   ObjectGenerationParams,
   logger,
+  EventType,
+  ModelType,
 } from "@elizaos/core";
 import pRetry from "p-retry";
 import { CacheService } from "../utils/cache";
@@ -122,7 +124,10 @@ export class GatewayProvider {
   /**
    * Generate text using small model with validation
    */
-  async generateTextSmall(params: GenerateTextParams): Promise<string> {
+  async generateTextSmall(
+    params: GenerateTextParams,
+    eventModelType?: ModelType,
+  ): Promise<string> {
     const requestedModel = getSmallModel(this.runtime);
     const modelToUse = this.validateModel(requestedModel);
 
@@ -168,6 +173,13 @@ export class GatewayProvider {
             : {}),
         });
 
+        this.runtime.emitEvent(EventType.MODEL_USED, {
+          provider: "aigateway",
+          type: eventModelType || ModelType.TEXT_SMALL,
+          tokens: response.usage.totalTokens,
+          model: modelToUse,
+        });
+
         return response.text;
       },
       {
@@ -189,7 +201,10 @@ export class GatewayProvider {
   /**
    * Generate text using large model with validation
    */
-  async generateTextLarge(params: GenerateTextParams): Promise<string> {
+  async generateTextLarge(
+    params: GenerateTextParams,
+    eventModelType?: ModelType,
+  ): Promise<string> {
     const requestedModel = getLargeModel(this.runtime);
     const modelToUse = this.validateModel(requestedModel);
 
@@ -233,6 +248,13 @@ export class GatewayProvider {
           ...(params.stopSequences && params.stopSequences.length > 0
             ? { stopSequences: params.stopSequences }
             : {}),
+        });
+
+        this.runtime.emitEvent(EventType.MODEL_USED, {
+          provider: "aigateway",
+          type: eventModelType || ModelType.TEXT_LARGE,
+          tokens: response.usage.totalTokens,
+          model: modelToUse,
         });
 
         return response.text;
@@ -317,6 +339,13 @@ export class GatewayProvider {
           value: params.text,
         });
 
+        this.runtime.emitEvent(EventType.MODEL_USED, {
+          provider: "aigateway",
+          type: ModelType.TEXT_EMBEDDING,
+          tokens: response.usage.totalTokens,
+          model: modelToUse,
+        });
+
         return response.embedding;
       },
       {
@@ -380,6 +409,15 @@ export class GatewayProvider {
       "[AIGateway] Object generation not yet fully implemented - falling back to text generation",
     );
     const textResult = await this.generateTextSmall(
+
+      {
+        prompt: params.prompt,
+        temperature: params.temperature,
+        maxTokens: 2048,
+      },
+      ModelType.OBJECT_SMALL,
+    );
+
       Object.fromEntries(
         Object.entries({
           prompt: params.prompt,
@@ -391,6 +429,7 @@ export class GatewayProvider {
         }).filter(([, v]) => v !== undefined),
       ) as GenerateTextParams,
     );
+
     try {
       const result = JSON.parse(textResult);
       this.cache.set(cacheKey, result, getCacheTTL(this.runtime));
@@ -418,6 +457,14 @@ export class GatewayProvider {
       "[AIGateway] Object generation not yet fully implemented - falling back to text generation",
     );
     const textResult = await this.generateTextLarge(
+      {
+        prompt: params.prompt,
+        temperature: params.temperature,
+        maxTokens: 4096,
+      },
+      ModelType.OBJECT_LARGE,
+    );
+
       Object.fromEntries(
         Object.entries({
           prompt: params.prompt,

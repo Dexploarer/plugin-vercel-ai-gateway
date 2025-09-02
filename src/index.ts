@@ -1,5 +1,13 @@
-import { IAgentRuntime, Plugin, ModelType, logger } from "@elizaos/core";
-import { GatewayProvider } from "./providers/gateway-provider.js";
+import {
+  IAgentRuntime,
+  Plugin,
+  ModelType,
+  logger,
+  GenerateTextParams,
+  TextEmbeddingParams,
+  ObjectGenerationParams,
+} from "@elizaos/core";
+import { GatewayProvider } from "./providers/gateway-provider";
 import { getConfig } from "./utils/config.js";
 import { openaiRoutes } from "./routes/openai-compat";
 import { socketIOStreamingRoutes } from "./routes/socketio-streaming";
@@ -17,6 +25,46 @@ const plugin: Plugin = {
   providers: [],
   routes: [...openaiRoutes, ...socketIOStreamingRoutes, ...centralCompatRoutes, ...healthRoutes],
   models: {
+    [ModelType.TEXT]: async (runtime: IAgentRuntime, params: any) => {
+      
+    }
+    [ModelType.TEXT_SMALL]: async (
+      runtime: IAgentRuntime,
+      params: GenerateTextParams,
+    ) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateTextSmall(params);
+    },
+    [ModelType.TEXT_LARGE]: async (
+      runtime: IAgentRuntime,
+      params: GenerateTextParams,
+    ) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateTextLarge(params);
+    },
+    [ModelType.TEXT_EMBEDDING]: async (
+      runtime: IAgentRuntime,
+      params: TextEmbeddingParams,
+    ) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateEmbedding(params);
+    },
+    [ModelType.IMAGE]: async (runtime: IAgentRuntime, params: any) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateImage(params);
+    },
+    [ModelType.OBJECT_SMALL]: async (
+      runtime: IAgentRuntime,
+      params: ObjectGenerationParams,
+    ) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateObjectSmall(params);
+    },
+    [ModelType.OBJECT_LARGE]: async (
+      runtime: IAgentRuntime,
+      params: ObjectGenerationParams,
+    ) => {
+=======
     [ModelType.TEXT_SMALL]: async (runtime: IAgentRuntime, params: any) => {
       const provider = new GatewayProvider(runtime);
       return provider.generateTextSmall(params);
