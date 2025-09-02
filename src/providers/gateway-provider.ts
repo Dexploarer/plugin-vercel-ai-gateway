@@ -390,13 +390,14 @@ export class GatewayProvider {
           apiKey: getApiKey(this.runtime),
           baseURL: getBaseURL(this.runtime),
         });
-        const imageModel = openai.image(modelToUse);
+        const imageId = modelToUse.includes("/") ? modelToUse.split("/")[1] : modelToUse;
+        const imageModel = openai.image(imageId);
 
         const response = await aiGenerateImage({
           model: imageModel,
           prompt: params.prompt,
           n: params.count,
-          size: params.size as any,
+          size: params.size,
         });
 
         return response.images.map((image) => ({
