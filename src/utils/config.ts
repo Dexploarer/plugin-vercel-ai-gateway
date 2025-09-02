@@ -71,6 +71,17 @@ export function getEmbeddingModel(runtime: IAgentRuntime): string {
 }
 
 /**
+ * Get image model
+ */
+export function getImageModel(runtime: IAgentRuntime): string {
+  return (
+    getSetting(runtime, "AIGATEWAY_IMAGE_MODEL") ||
+    getSetting(runtime, "AI_GATEWAY_IMAGE_MODEL") ||
+    "dall-e-3"
+  )!;
+}
+
+/**
  * Get maximum retry attempts
  */
 export function getMaxRetries(runtime: IAgentRuntime): number {
