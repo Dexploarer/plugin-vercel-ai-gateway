@@ -12,11 +12,16 @@ import {
 import pRetry from "p-retry";
 import { CacheService } from "../utils/cache";
 import {
+  EventType,
+  ModelType,
+} from "@elizaos/core";
+import {
   getApiKey,
   getBaseURL,
   getSmallModel,
   getLargeModel,
   getEmbeddingModel,
+  getImageModel,
   getMaxRetries,
   getCacheTTL,
   useOIDC,
@@ -366,7 +371,19 @@ export class GatewayProvider {
     prompt: string;
     count?: number;
     size?: string;
-  }): Promise<{ url: string; revisedPrompt?: string }[]> {
+  }): Promise<{ url:string; revisedPrompt?: string }[]> {
+    const requestedModel = getImageModel(this.runtime);
+    const modelToUse = this.validateModel(requestedModel);
+
+    logger.info(`[AIGateway] Using IMAGE model: ${modelToUse}`);
+
+    this.runtime.emitEvent(EventType.MODEL_USED, {
+      provider: "aigateway",
+      type: ModelType.IMAGE,
+      tokens: 0,
+      model: modelToUse,
+    });
+
     logger.warn(
       "[AIGateway] Image generation not yet implemented for Vercel AI Gateway",
     );
@@ -379,10 +396,20 @@ export class GatewayProvider {
    * Generate object using small model with validation (simplified for now)
    */
   async generateObjectSmall(params: ObjectGenerationParams): Promise<any> {
+    const requestedModel = getSmallModel(this.runtime);
+    const modelToUse = this.validateModel(requestedModel);
+    logger.info(`[AIGateway] Using OBJECT_SMALL model: ${modelToUse}`);
+    const cacheKey = this.cache.generateKey({ model: modelToUse, ...params });
+    const cached = this.cache.get<any>(cacheKey);
+    if (cached) {
+      logger.debug("[AIGateway] Cache hit for OBJECT_SMALL");
+      return cached;
+    }
     logger.warn(
       "[AIGateway] Object generation not yet fully implemented - falling back to text generation",
     );
     const textResult = await this.generateTextSmall(
+
       {
         prompt: params.prompt,
         temperature: params.temperature,
@@ -391,9 +418,24 @@ export class GatewayProvider {
       ModelType.OBJECT_SMALL,
     );
 
+      Object.fromEntries(
+        Object.entries({
+          prompt: params.prompt,
+          temperature: params.temperature,
+          maxTokens: 2048,
+          stopSequences: params.stopSequences,
+          frequencyPenalty: params.frequencyPenalty,
+          presencePenalty: params.presencePenalty,
+        }).filter(([, v]) => v !== undefined),
+      ) as GenerateTextParams,
+    );
+
     try {
-      return JSON.parse(textResult);
-    } catch {
+      const result = JSON.parse(textResult);
+      this.cache.set(cacheKey, result, getCacheTTL(this.runtime));
+      return result;
+    } catch (error: any) {
+      logger.error(`[AIGateway] JSON parse error in OBJECT_SMALL: ${error.message}`);
       return { text: textResult };
     }
   }
@@ -402,6 +444,15 @@ export class GatewayProvider {
    * Generate object using large model with validation (simplified for now)
    */
   async generateObjectLarge(params: ObjectGenerationParams): Promise<any> {
+    const requestedModel = getLargeModel(this.runtime);
+    const modelToUse = this.validateModel(requestedModel);
+    logger.info(`[AIGateway] Using OBJECT_LARGE model: ${modelToUse}`);
+    const cacheKey = this.cache.generateKey({ model: modelToUse, ...params });
+    const cached = this.cache.get<any>(cacheKey);
+    if (cached) {
+      logger.debug("[AIGateway] Cache hit for OBJECT_LARGE");
+      return cached;
+    }
     logger.warn(
       "[AIGateway] Object generation not yet fully implemented - falling back to text generation",
     );
@@ -414,9 +465,23 @@ export class GatewayProvider {
       ModelType.OBJECT_LARGE,
     );
 
+      Object.fromEntries(
+        Object.entries({
+          prompt: params.prompt,
+          temperature: params.temperature,
+          maxTokens: 4096,
+          stopSequences: params.stopSequences,
+          frequencyPenalty: params.frequencyPenalty,
+          presencePenalty: params.presencePenalty,
+        }).filter(([, v]) => v !== undefined),
+      ) as GenerateTextParams,
+    );
     try {
-      return JSON.parse(textResult);
-    } catch {
+      const result = JSON.parse(textResult);
+      this.cache.set(cacheKey, result, getCacheTTL(this.runtime));
+      return result;
+    } catch (error: any) {
+      logger.error(`[AIGateway] JSON parse error in OBJECT_LARGE: ${error.message}`);
       return { text: textResult };
     }
   }

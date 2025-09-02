@@ -25,6 +25,9 @@ const plugin: Plugin = {
   providers: [],
   routes: [...openaiRoutes, ...socketIOStreamingRoutes, ...centralCompatRoutes, ...healthRoutes],
   models: {
+    [ModelType.TEXT]: async (runtime: IAgentRuntime, params: any) => {
+      
+    }
     [ModelType.TEXT_SMALL]: async (
       runtime: IAgentRuntime,
       params: GenerateTextParams,
@@ -61,6 +64,28 @@ const plugin: Plugin = {
       runtime: IAgentRuntime,
       params: ObjectGenerationParams,
     ) => {
+=======
+    [ModelType.TEXT_SMALL]: async (runtime: IAgentRuntime, params: any) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateTextSmall(params);
+    },
+    [ModelType.TEXT_LARGE]: async (runtime: IAgentRuntime, params: any) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateTextLarge(params);
+    },
+    [ModelType.TEXT_EMBEDDING]: async (runtime: IAgentRuntime, params: any) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateEmbedding(params);
+    },
+    [ModelType.IMAGE]: async (runtime: IAgentRuntime, params: { prompt: string; count?: number; size?: string; }) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateImage(params);
+    },
+    [ModelType.OBJECT_SMALL]: async (runtime: IAgentRuntime, params: any) => {
+      const provider = new GatewayProvider(runtime);
+      return provider.generateObjectSmall(params);
+    },
+    [ModelType.OBJECT_LARGE]: async (runtime: IAgentRuntime, params: any) => {
       const provider = new GatewayProvider(runtime);
       return provider.generateObjectLarge(params);
     },
