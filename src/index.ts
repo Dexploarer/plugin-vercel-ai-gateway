@@ -1,4 +1,12 @@
-import { IAgentRuntime, Plugin, ModelType, logger } from "@elizaos/core";
+import {
+  IAgentRuntime,
+  Plugin,
+  ModelType,
+  logger,
+  GenerateTextParams,
+  TextEmbeddingParams,
+  ObjectGenerationParams,
+} from "@elizaos/core";
 import { GatewayProvider } from "./providers/gateway-provider";
 import { GatewayProvider } from "./providers/gateway-provider.js";
 import { getConfig } from "./utils/config.js";
@@ -18,46 +26,43 @@ const plugin: Plugin = {
   providers: [],
   routes: [...openaiRoutes, ...socketIOStreamingRoutes, ...centralCompatRoutes, ...healthRoutes],
   models: {
-    [ModelType.TEXT_SMALL]: async (params: any) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
-      }
-      const provider = new GatewayProvider(params.runtime);
+    [ModelType.TEXT_SMALL]: async (
+      runtime: IAgentRuntime,
+      params: GenerateTextParams,
+    ) => {
+      const provider = new GatewayProvider(runtime);
       return provider.generateTextSmall(params);
     },
-    [ModelType.TEXT_LARGE]: async (params: any) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
-      }
-      const provider = new GatewayProvider(params.runtime);
+    [ModelType.TEXT_LARGE]: async (
+      runtime: IAgentRuntime,
+      params: GenerateTextParams,
+    ) => {
+      const provider = new GatewayProvider(runtime);
       return provider.generateTextLarge(params);
     },
-    [ModelType.TEXT_EMBEDDING]: async (params: any) => {
-      if (!params || !params.runtime) {
-        throw new Error("Embedding parameters cannot be null");
-      }
-      const provider = new GatewayProvider(params.runtime);
+    [ModelType.TEXT_EMBEDDING]: async (
+      runtime: IAgentRuntime,
+      params: TextEmbeddingParams,
+    ) => {
+      const provider = new GatewayProvider(runtime);
       return provider.generateEmbedding(params);
     },
-    [ModelType.IMAGE]: async (params: any) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
-      }
-      const provider = new GatewayProvider(params.runtime);
+    [ModelType.IMAGE]: async (runtime: IAgentRuntime, params: any) => {
+      const provider = new GatewayProvider(runtime);
       return provider.generateImage(params);
     },
-    [ModelType.OBJECT_SMALL]: async (params: any) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
-      }
-      const provider = new GatewayProvider(params.runtime);
+    [ModelType.OBJECT_SMALL]: async (
+      runtime: IAgentRuntime,
+      params: ObjectGenerationParams,
+    ) => {
+      const provider = new GatewayProvider(runtime);
       return provider.generateObjectSmall(params);
     },
-    [ModelType.OBJECT_LARGE]: async (params: any) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
-      }
-      const provider = new GatewayProvider(params.runtime);
+    [ModelType.OBJECT_LARGE]: async (
+      runtime: IAgentRuntime,
+      params: ObjectGenerationParams,
+    ) => {
+      const provider = new GatewayProvider(runtime);
       return provider.generateObjectLarge(params);
     },
   },
