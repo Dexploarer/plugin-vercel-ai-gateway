@@ -8,7 +8,6 @@ import {
   ObjectGenerationParams,
 } from "@elizaos/core";
 import { GatewayProvider } from "./providers/gateway-provider";
-import { GatewayProvider } from "./providers/gateway-provider.js";
 import { getConfig } from "./utils/config.js";
 import { openaiRoutes } from "./routes/openai-compat";
 import { socketIOStreamingRoutes } from "./routes/socketio-streaming";
