@@ -1,4 +1,9 @@
-import { generateText, generateObject as aiGenerateObject, embed } from "ai";
+import {
+  generateText,
+  generateObject as aiGenerateObject,
+  embed,
+  experimental_generateImage as aiGenerateImage,
+} from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import {
   IAgentRuntime,
@@ -6,6 +11,8 @@ import {
   TextEmbeddingParams,
   ObjectGenerationParams,
   logger,
+  EventType,
+  ModelType,
 } from "@elizaos/core";
 import pRetry from "p-retry";
 import { CacheService } from "../utils/cache";
@@ -15,6 +22,7 @@ import {
   getSmallModel,
   getLargeModel,
   getEmbeddingModel,
+  getImageModel,
   getMaxRetries,
   getCacheTTL,
   useOIDC,
@@ -24,6 +32,13 @@ import {
   validateAndSuggestModel,
   logModelAccess,
 } from "../utils/model-controls";
+
+// TODO: Move to @elizaos/core
+export type ImageGenerationParams = {
+  prompt: string;
+  count?: number;
+  size?: string;
+};
 
 /**
  * Gateway Provider for Vercel AI Gateway with Model Controls
@@ -44,7 +59,9 @@ export class GatewayProvider {
     logger.info(`[AIGateway] OIDC enabled: ${useOIDC(runtime)}`);
     logger.info(`[AIGateway] API Key configured: ${!!getApiKey(runtime)}`);
     logger.info(
-      `[AIGateway] Model blocking disabled: ${isModelBlockingDisabled(runtime)}`,
+      `[AIGateway] Model blocking disabled: ${isModelBlockingDisabled(
+        runtime,
+      )}`,
     );
   }
 
@@ -133,7 +150,10 @@ export class GatewayProvider {
 
     const result = await pRetry(
       async () => {
-        const messages: { role: "system" | "user" | "assistant"; content: string }[] = [];
+        const messages: {
+          role: "system" | "user" | "assistant";
+          content: string;
+        }[] = [];
 
         if (this.runtime.character?.system) {
           messages.push({
@@ -148,7 +168,9 @@ export class GatewayProvider {
           apiKey: getApiKey(this.runtime),
           baseURL: getBaseURL(this.runtime),
         });
-        const smallId = modelToUse.includes("/") ? modelToUse.split("/")[1] : modelToUse;
+        const smallId = modelToUse.includes("/")
+          ? modelToUse.split("/")[1]
+          : modelToUse;
         const smallModel = openai(smallId);
 
         const response = await generateText({
@@ -200,7 +222,10 @@ export class GatewayProvider {
 
     const result = await pRetry(
       async () => {
-        const messages: { role: "system" | "user" | "assistant"; content: string }[] = [];
+        const messages: {
+          role: "system" | "user" | "assistant";
+          content: string;
+        }[] = [];
 
         if (this.runtime.character?.system) {
           messages.push({
@@ -215,7 +240,9 @@ export class GatewayProvider {
           apiKey: getApiKey(this.runtime),
           baseURL: getBaseURL(this.runtime),
         });
-        const largeId = modelToUse.includes("/") ? modelToUse.split("/")[1] : modelToUse;
+        const largeId = modelToUse.includes("/")
+          ? modelToUse.split("/")[1]
+          : modelToUse;
         const largeModel = openai(largeId);
 
         const response = await generateText({
@@ -267,7 +294,6 @@ export class GatewayProvider {
 
     const result = await pRetry(
       async () => {
-
         logger.info(
           `[AIGateway] Embedding request - Model: ${modelToUse}, Text: "${params.text}"`,
         );
@@ -280,20 +306,24 @@ export class GatewayProvider {
           maxEmbeddingsPerCall: 1,
           supportsParallelCalls: false,
           doEmbed: async ({ values, headers, abortSignal }: any) => {
-            const token = getApiKey(this.runtime) || process.env.VERCEL_OIDC_TOKEN;
-            const response = await fetch(`${getBaseURL(this.runtime)}/embeddings`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-                ...headers,
+            const token =
+              getApiKey(this.runtime) || process.env.VERCEL_OIDC_TOKEN;
+            const response = await fetch(
+              `${getBaseURL(this.runtime)}/embeddings`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                  ...headers,
+                },
+                body: JSON.stringify({
+                  model: modelToUse,
+                  input: values[0],
+                }),
+                signal: abortSignal,
               },
-              body: JSON.stringify({
-                model: modelToUse,
-                input: values[0],
-              }),
-              signal: abortSignal,
-            });
+            );
 
             if (!response.ok) {
               const errorText = await response.text();
@@ -331,62 +361,140 @@ export class GatewayProvider {
   }
 
   /**
-   * Generate image (placeholder - not directly supported by AI SDK embed/generateText)
+   * Generate image
    */
-  async generateImage(params: {
-    prompt: string;
-    count?: number;
-    size?: string;
-  }): Promise<{ url: string; revisedPrompt?: string }[]> {
-    logger.warn(
-      "[AIGateway] Image generation not yet implemented for Vercel AI Gateway",
+  async generateImage(
+    params: ImageGenerationParams,
+  ): Promise<{ url: string; revisedPrompt?: string }[]> {
+    const requestedModel = getImageModel(this.runtime);
+    const modelToUse = this.validateModel(requestedModel);
+
+    logger.info(`[AIGateway] Using IMAGE model: ${modelToUse}`);
+
+    try {
+      this.runtime.emitEvent(EventType.MODEL_USED, {
+        provider: "aigateway",
+        type: ModelType.IMAGE,
+        tokens: 0,
+        model: modelToUse,
+      });
+    } catch (error: any) {
+      logger.warn(
+        `[AIGateway] Failed to emit model usage event: ${error.message}`,
+      );
+    }
+
+    const result = await pRetry(
+      async () => {
+        const openai = createOpenAI({
+          apiKey: getApiKey(this.runtime),
+          baseURL: getBaseURL(this.runtime),
+        });
+        const imageModel = openai.image(modelToUse);
+
+        const response = await aiGenerateImage({
+          model: imageModel,
+          prompt: params.prompt,
+          n: params.count,
+          size: params.size as any,
+        });
+
+        return response.images.map((image) => ({
+          url: image.url,
+          revisedPrompt: image.revisedPrompt,
+        }));
+      },
+      {
+        retries: getMaxRetries(this.runtime),
+        onFailedAttempt: (error) => {
+          logger.warn(
+            `[AIGateway] IMAGE attempt ${error.attemptNumber} failed: ${error.message}`,
+          );
+        },
+      },
     );
-    throw new Error(
-      "Image generation not yet implemented for Vercel AI Gateway",
-    );
+
+    return result;
   }
 
   /**
-   * Generate object using small model with validation (simplified for now)
+   * Private method to generate object with validation
+   */
+  private async _generateObject(
+    params: ObjectGenerationParams,
+    modelSize: "small" | "large",
+  ): Promise<any> {
+    const { getModel, textGenerator, maxTokens, modelType } =
+      modelSize === "small"
+        ? {
+            getModel: getSmallModel,
+            textGenerator: this.generateTextSmall.bind(this),
+            maxTokens: 2048,
+            modelType: "OBJECT_SMALL",
+          }
+        : {
+            getModel: getLargeModel,
+            textGenerator: this.generateTextLarge.bind(this),
+            maxTokens: 4096,
+            modelType: "OBJECT_LARGE",
+          };
+
+    const requestedModel = getModel(this.runtime);
+    const modelToUse = this.validateModel(requestedModel);
+    logger.info(`[AIGateway] Using ${modelType} model: ${modelToUse}`);
+
+    const cacheKey = this.cache.generateKey({ model: modelToUse, ...params });
+    const cached = this.cache.get<any>(cacheKey);
+    if (cached) {
+      logger.debug(`[AIGateway] Cache hit for ${modelType}`);
+      return cached;
+    }
+
+    logger.warn(
+      `[AIGateway] Object generation not yet fully implemented - falling back to text generation`,
+    );
+
+    const textParams: GenerateTextParams = Object.fromEntries(
+      Object.entries({
+        prompt: params.prompt,
+        temperature: params.temperature,
+        maxTokens,
+        stopSequences: params.stopSequences,
+        frequencyPenalty: params.frequencyPenalty,
+        presencePenalty: params.presencePenalty,
+      }).filter(([, v]) => v !== undefined),
+    ) as GenerateTextParams;
+
+    const textResult = await textGenerator(textParams);
+
+    try {
+      const result = JSON.parse(textResult);
+      this.cache.set(cacheKey, result, getCacheTTL(this.runtime));
+      return result;
+    } catch (error: any) {
+      logger.error(
+        `[AIGateway] JSON parse error in ${modelType}: ${error.message}`,
+      );
+      logger.debug(
+        `[AIGateway] Failed text content: ${textResult.substring(0, 500)}${
+          textResult.length > 500 ? "..." : ""
+        }`,
+      );
+      return { text: textResult };
+    }
+  }
+
+  /**
+   * Generate object using small model with validation
    */
   async generateObjectSmall(params: ObjectGenerationParams): Promise<any> {
-    logger.warn(
-      "[AIGateway] Object generation not yet fully implemented - falling back to text generation",
-    );
-    const textResult = await this.generateTextSmall({
-      prompt: params.prompt,
-      temperature: params.temperature,
-      maxTokens: 2048,
-      runtime: this.runtime,
-      modelType: "TEXT_SMALL" as any,
-    });
-
-    try {
-      return JSON.parse(textResult);
-    } catch {
-      return { text: textResult };
-    }
+    return this._generateObject(params, "small");
   }
 
   /**
-   * Generate object using large model with validation (simplified for now)
+   * Generate object using large model with validation
    */
   async generateObjectLarge(params: ObjectGenerationParams): Promise<any> {
-    logger.warn(
-      "[AIGateway] Object generation not yet fully implemented - falling back to text generation",
-    );
-    const textResult = await this.generateTextLarge({
-      prompt: params.prompt,
-      temperature: params.temperature,
-      maxTokens: 4096,
-      runtime: this.runtime,
-      modelType: "TEXT_LARGE" as any,
-    });
-
-    try {
-      return JSON.parse(textResult);
-    } catch {
-      return { text: textResult };
-    }
+    return this._generateObject(params, "large");
   }
 }

@@ -39,6 +39,7 @@ describe("Config Utils", () => {
       expect(config.defaultModel).toBe("openai/gpt-4o-mini");
       expect(config.largeModel).toBe("openai/gpt-4o");
       expect(config.embeddingModel).toBe("openai/text-embedding-3-small");
+      expect(config.imageModel).toBe("dall-e-3");
       expect(config.grokModelsEnabled).toBe(false);
       expect(config.cacheTTL).toBe(300);
       expect(config.maxRetries).toBe(3);

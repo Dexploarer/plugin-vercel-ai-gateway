@@ -1,6 +1,6 @@
 import {
   StreamingGatewayProvider
-} from "./chunk-K5PJWKP7.js";
+} from "./chunk-CWLVCKS6.js";
 import {
   GatewayProvider,
   applyModelControls,
@@ -8,10 +8,13 @@ import {
   getCentralRateLimitPerMin,
   getConfig,
   getInternalToken
-} from "./chunk-LGE2GP52.js";
+} from "./chunk-CERAHGUE.js";
 
 // src/index.ts
-import { ModelType as ModelType2, logger as logger6 } from "@elizaos/core";
+import {
+  ModelType as ModelType2,
+  logger as logger5
+} from "@elizaos/core";
 
 // src/routes/openai-compat.ts
 import { ModelType, logger } from "@elizaos/core";
@@ -50,7 +53,10 @@ async function listModels(req, res, runtime) {
       data: modelList
     });
   } catch (error) {
-    logger.error("[AIGateway] Error listing models:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error listing models:",
+      error instanceof Error ? error.message : String(error)
+    );
     res.status(500).json({
       error: {
         message: "Internal server error",
@@ -153,7 +159,10 @@ async function chatCompletions(req, res, runtime) {
         res.write("data: [DONE]\n\n");
         res.end();
       } catch (streamError) {
-        logger.error("[AIGateway] Error in streaming:", streamError instanceof Error ? streamError.message : String(streamError));
+        logger.error(
+          "[AIGateway] Error in streaming:",
+          streamError instanceof Error ? streamError.message : String(streamError)
+        );
         res.write(
           `data: {"error": {"message": "Streaming failed", "type": "internal_error"}}
 
@@ -185,7 +194,10 @@ async function chatCompletions(req, res, runtime) {
       });
     }
   } catch (error) {
-    logger.error("[AIGateway] Error in chat completions:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error in chat completions:",
+      error instanceof Error ? error.message : String(error)
+    );
     res.status(500).json({
       error: {
         message: "Internal server error",
@@ -229,7 +241,10 @@ async function createEmbeddings(req, res, runtime) {
       }
     });
   } catch (error) {
-    logger.error("[AIGateway] Error creating embeddings:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error creating embeddings:",
+      error instanceof Error ? error.message : String(error)
+    );
     res.status(500).json({
       error: {
         message: "Internal server error",
@@ -292,7 +307,10 @@ async function processImageUrl(url, runtime) {
     }
     return null;
   } catch (error) {
-    logger.error("[AIGateway] Error processing image URL:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error processing image URL:",
+      error instanceof Error ? error.message : String(error)
+    );
     return null;
   }
 }
@@ -325,7 +343,10 @@ async function uploadFile(req, res, runtime) {
       url: result.url
     });
   } catch (error) {
-    logger.error("[AIGateway] Error uploading file:", error instanceof Error ? error.message : String(error));
+    logger.error(
+      "[AIGateway] Error uploading file:",
+      error instanceof Error ? error.message : String(error)
+    );
     res.status(500).json({
       error: {
         message: "File upload failed",
@@ -560,160 +581,8 @@ var socketIOStreamingRoutes = [
   }
 ];
 
-// src/actions/tool-calls.ts
-import {
-  logger as logger3
-} from "@elizaos/core";
-var toolCallsAction = {
-  name: "TOOL_CALLS",
-  similes: ["function_call", "tool_use", "function_execution"],
-  description: "Execute tool/function calls using AI Gateway integration with ElizaOS actions",
-  examples: [
-    [
-      {
-        name: "User",
-        content: {
-          text: "What's the weather like in San Francisco?"
-        }
-      },
-      {
-        name: "Assistant",
-        content: {
-          text: "I'll check the weather in San Francisco for you.",
-          action: "TOOL_CALLS"
-        }
-      }
-    ]
-  ],
-  validate: async (runtime, message, state) => {
-    const messageText = message.content?.text?.toLowerCase() || "";
-    const toolPatterns = [
-      /weather/i,
-      /calculate/i,
-      /search/i,
-      /get.*information/i,
-      /lookup/i,
-      /find/i
-    ];
-    return toolPatterns.some((pattern) => pattern.test(messageText));
-  },
-  handler: async (runtime, message, state, options) => {
-    try {
-      logger3.debug("[AIGateway] Processing tool calls action");
-      const toolCalls = extractToolCalls(message);
-      if (!toolCalls || toolCalls.length === 0) {
-        return {
-          success: false,
-          error: "No valid tool calls found in message"
-        };
-      }
-      const results = [];
-      for (const toolCall of toolCalls) {
-        try {
-          const result = await executeToolCall(runtime, toolCall, state);
-          results.push({
-            tool_call_id: toolCall.id,
-            role: "tool",
-            content: JSON.stringify(result)
-          });
-        } catch (error) {
-          logger3.error(
-            `[AIGateway] Error executing tool call ${toolCall.id}:`,
-            error
-          );
-          results.push({
-            tool_call_id: toolCall.id,
-            role: "tool",
-            content: JSON.stringify({
-              error: error instanceof Error ? error.message : "Unknown error"
-            })
-          });
-        }
-      }
-      return {
-        success: true,
-        text: "Tool calls executed successfully",
-        data: {
-          tool_results: results,
-          tool_calls_count: toolCalls.length
-        }
-      };
-    } catch (error) {
-      logger3.error("[AIGateway] Error in tool calls handler:", error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error in tool calls"
-      };
-    }
-  }
-};
-function extractToolCalls(message) {
-  const toolCalls = [];
-  if (message.content?.tool_calls) {
-    return message.content.tool_calls;
-  }
-  const text = message.content?.text || "";
-  const functionCallPattern = /(\w+)\((.*?)\)/g;
-  let match;
-  let callId = 1;
-  while ((match = functionCallPattern.exec(text)) !== null) {
-    const [, functionName, args] = match;
-    toolCalls.push({
-      id: `call_${callId++}`,
-      type: "function",
-      function: {
-        name: functionName,
-        arguments: args || "{}"
-      }
-    });
-  }
-  return toolCalls;
-}
-async function executeToolCall(runtime, toolCall, state) {
-  const { function: func } = toolCall;
-  const functionMappings = {
-    get_weather: "weather",
-    search_web: "web_search",
-    calculate: "calculation",
-    get_time: "time",
-    send_message: "message"
-  };
-  const actionName = functionMappings[func.name] || func.name;
-  const action = runtime.actions.find(
-    (a) => a.name.toLowerCase().includes(actionName.toLowerCase()) || a.similes?.some(
-      (s) => s.toLowerCase().includes(actionName.toLowerCase())
-    )
-  );
-  if (!action) {
-    throw new Error(`No action found for function: ${func.name}`);
-  }
-  let args = {};
-  try {
-    args = JSON.parse(func.arguments);
-  } catch (error) {
-    logger3.warn(
-      `[AIGateway] Failed to parse tool call arguments: ${func.arguments}`
-    );
-  }
-  const mockMessage = {
-    id: `tool_call_${toolCall.id}`,
-    userId: "system",
-    agentId: runtime.agentId,
-    roomId: state?.roomId || "tool_calls",
-    content: {
-      text: `Execute ${func.name} with arguments: ${JSON.stringify(args)}`,
-      action: action.name,
-      ...args
-    },
-    createdAt: Date.now(),
-    embedding: []
-  };
-  const result = await action.handler(runtime, mockMessage, state);
-  return result;
-}
-
 // src/routes/central-compat.ts
-import { logger as logger4 } from "@elizaos/core";
+import { logger as logger3 } from "@elizaos/core";
 import { randomUUID } from "crypto";
 import { z } from "zod";
 function authorizeInternal(req, runtime) {
@@ -735,7 +604,7 @@ async function ensureAgentParticipantInternal(runtime, channelId) {
   const participants = await serverInstance.getChannelParticipants?.(channelId);
   if (!participants?.includes(agentId)) {
     await serverInstance.addParticipantsToChannel?.(channelId, [agentId]);
-    logger4.info(`[CentralCompat] Added agent ${agentId} to channel ${channelId}`);
+    logger3.info(`[CentralCompat] Added agent ${agentId} to channel ${channelId}`);
   }
   return { channelId, agentId };
 }
@@ -747,10 +616,10 @@ async function ensureAgentParticipant(req, res, runtime) {
     if (!auth.ok) return void res.status(403).json({ success: false, reqId, error: auth.message });
     const { channelId } = req.params;
     const data = await ensureAgentParticipantInternal(runtime, channelId);
-    logger4.info(`[CentralCompat][${reqId}] ensured agent in channel ${channelId}`);
+    logger3.info(`[CentralCompat][${reqId}] ensured agent in channel ${channelId}`);
     res.json({ success: true, reqId, data });
   } catch (err) {
-    logger4.error(`[CentralCompat][${reqId}] ensure-agent failed: ${err?.message || String(err)}`);
+    logger3.error(`[CentralCompat][${reqId}] ensure-agent failed: ${err?.message || String(err)}`);
     res.status(500).json({ success: false, reqId, error: err?.message || String(err) });
   }
 }
@@ -784,7 +653,7 @@ var centralCompatRoutes = [
           return void res.status(429).json({ success: false, reqId, error: "Rate limit exceeded" });
         }
         await ensureAgentParticipantInternal(runtime, channelId);
-        const { GatewayProvider: GatewayProvider2 } = await import("./gateway-provider-AB6HTDVJ.js");
+        const { GatewayProvider: GatewayProvider2 } = await import("./gateway-provider-ABKW5JID.js");
         const provider = new GatewayProvider2(runtime);
         const text = modelSize === "large" ? await provider.generateTextLarge({ prompt, runtime }) : await provider.generateTextSmall({ prompt, runtime });
         const base = `${req.protocol}://${req.get("host")}`;
@@ -807,11 +676,11 @@ var centralCompatRoutes = [
           throw new Error(`Central message post failed: HTTP ${resp.status} ${t}`);
         }
         const data = await resp.json();
-        logger4.info(`[CentralCompat][${reqId}] posted reply to channel ${channelId}`);
+        logger3.info(`[CentralCompat][${reqId}] posted reply to channel ${channelId}`);
         res.json({ success: true, reqId, data: { message: text, central: data?.data } });
       } catch (err) {
         const reqId = String(res.getHeader("X-Request-Id") || "-");
-        logger4.error(`[CentralCompat][${reqId}] reply failed: ${err?.message || String(err)}`);
+        logger3.error(`[CentralCompat][${reqId}] reply failed: ${err?.message || String(err)}`);
         res.status(500).json({ success: false, reqId, error: err?.message || String(err) });
       }
     }
@@ -847,7 +716,7 @@ var centralCompatRoutes = [
           Connection: "keep-alive",
           "X-Request-Id": String(reqId)
         });
-        const { StreamingGatewayProvider: StreamingGatewayProvider2 } = await import("./streaming-gateway-provider-5V5LTDRY.js");
+        const { StreamingGatewayProvider: StreamingGatewayProvider2 } = await import("./streaming-gateway-provider-34AIFXZ3.js");
         const streamer = new StreamingGatewayProvider2(runtime);
         const gen = modelSize === "large" ? streamer.generateTextLargeStream(runtime, { prompt, maxTokens }) : streamer.generateTextSmallStream(runtime, { prompt, maxTokens });
         let accumulated = "";
@@ -882,7 +751,7 @@ var centralCompatRoutes = [
 `);
         res.end();
       } catch (err) {
-        logger4.error(`[CentralCompat][${reqId}] stream reply failed: ${err?.message || String(err)}`);
+        logger3.error(`[CentralCompat][${reqId}] stream reply failed: ${err?.message || String(err)}`);
         try {
           res.write(`event: error
 `);
@@ -924,7 +793,7 @@ function __setLimiterMaxFromRuntime(runtime) {
 }
 
 // src/routes/health.ts
-import { logger as logger5 } from "@elizaos/core";
+import { logger as logger4 } from "@elizaos/core";
 import { randomUUID as randomUUID2 } from "crypto";
 
 // src/utils/client.ts
@@ -1039,7 +908,7 @@ async function handler(req, res, runtime) {
     }
     res.json(results);
   } catch (e) {
-    logger5.error(`[Health] failed: ${e?.message || String(e)}`);
+    logger4.error(`[Health] failed: ${e?.message || String(e)}`);
     res.status(500).json({ ok: false, reqId, error: e?.message || String(e) });
   }
 }
@@ -1051,59 +920,84 @@ var healthRoutes = [
 var plugin = {
   name: "aigateway",
   description: "Universal AI Gateway integration plugin for elizaOS with Grok model protection - Access 100+ AI models through unified gateways",
-  actions: [toolCallsAction],
+  actions: [
+    /*toolCallsAction*/
+  ],
   evaluators: [],
   providers: [],
-  routes: [...openaiRoutes, ...socketIOStreamingRoutes, ...centralCompatRoutes, ...healthRoutes],
+  routes: [
+    ...openaiRoutes,
+    ...socketIOStreamingRoutes,
+    ...centralCompatRoutes,
+    ...healthRoutes
+  ],
   models: {
-    [ModelType2.TEXT_SMALL]: async (params) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
+    [ModelType2.TEXT_SMALL]: async (runtime, params) => {
+      try {
+        const provider = new GatewayProvider(runtime);
+        return provider.generateTextSmall(params);
+      } catch (error) {
+        logger5.error(`[AIGateway] TEXT_SMALL handler error: ${error.message}`);
+        throw error;
       }
-      const provider = new GatewayProvider(params.runtime);
-      return provider.generateTextSmall(params);
     },
-    [ModelType2.TEXT_LARGE]: async (params) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
+    [ModelType2.TEXT_LARGE]: async (runtime, params) => {
+      try {
+        const provider = new GatewayProvider(runtime);
+        return provider.generateTextLarge(params);
+      } catch (error) {
+        logger5.error(`[AIGateway] TEXT_LARGE handler error: ${error.message}`);
+        throw error;
       }
-      const provider = new GatewayProvider(params.runtime);
-      return provider.generateTextLarge(params);
     },
-    [ModelType2.TEXT_EMBEDDING]: async (params) => {
-      if (!params || !params.runtime) {
-        throw new Error("Embedding parameters cannot be null");
+    [ModelType2.TEXT_EMBEDDING]: async (runtime, params) => {
+      try {
+        const provider = new GatewayProvider(runtime);
+        return provider.generateEmbedding(params);
+      } catch (error) {
+        logger5.error(
+          `[AIGateway] TEXT_EMBEDDING handler error: ${error.message}`
+        );
+        throw error;
       }
-      const provider = new GatewayProvider(params.runtime);
-      return provider.generateEmbedding(params);
     },
-    [ModelType2.IMAGE]: async (params) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
+    [ModelType2.IMAGE]: async (runtime, params) => {
+      try {
+        const provider = new GatewayProvider(runtime);
+        return provider.generateImage(params);
+      } catch (error) {
+        logger5.error(`[AIGateway] IMAGE handler error: ${error.message}`);
+        throw error;
       }
-      const provider = new GatewayProvider(params.runtime);
-      return provider.generateImage(params);
     },
-    [ModelType2.OBJECT_SMALL]: async (params) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
+    [ModelType2.OBJECT_SMALL]: async (runtime, params) => {
+      try {
+        const provider = new GatewayProvider(runtime);
+        return provider.generateObjectSmall(params);
+      } catch (error) {
+        logger5.error(
+          `[AIGateway] OBJECT_SMALL handler error: ${error.message}`
+        );
+        throw error;
       }
-      const provider = new GatewayProvider(params.runtime);
-      return provider.generateObjectSmall(params);
     },
-    [ModelType2.OBJECT_LARGE]: async (params) => {
-      if (!params || !params.runtime) {
-        throw new Error("Runtime parameter is required");
+    [ModelType2.OBJECT_LARGE]: async (runtime, params) => {
+      try {
+        const provider = new GatewayProvider(runtime);
+        return provider.generateObjectLarge(params);
+      } catch (error) {
+        logger5.error(
+          `[AIGateway] OBJECT_LARGE handler error: ${error.message}`
+        );
+        throw error;
       }
-      const provider = new GatewayProvider(params.runtime);
-      return provider.generateObjectLarge(params);
     }
   },
   // Accept both usages at runtime: init(runtime) or init(config, runtime)
   // Keep implementation simple and type-safe: no return value expected
   init: async (...args) => {
     const runtime = args.length === 1 ? args[0] : args[1];
-    logger6.info("[AIGateway] Plugin initialized with models export structure");
+    logger5.info("[AIGateway] Plugin initialized with models export structure");
     void runtime;
   }
 };

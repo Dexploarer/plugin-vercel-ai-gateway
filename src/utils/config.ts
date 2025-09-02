@@ -1,5 +1,11 @@
 import { IAgentRuntime } from "@elizaos/core";
 
+const DEFAULT_BASE_URL = "https://ai-gateway.vercel.sh/v1";
+const DEFAULT_SMALL_MODEL = "openai/gpt-4o-mini";
+const DEFAULT_LARGE_MODEL = "openai/gpt-4o";
+const DEFAULT_EMBEDDING_MODEL = "openai/text-embedding-3-small";
+const DEFAULT_IMAGE_MODEL = "dall-e-3";
+
 /**
  * Retrieves a configuration setting from the runtime, falling back to environment variables or a default value if not found.
  */
@@ -21,8 +27,7 @@ function getSetting(
 export function getApiKey(runtime: IAgentRuntime): string | undefined {
   return (
     getSetting(runtime, "AIGATEWAY_API_KEY") ||
-    getSetting(runtime, "AI_GATEWAY_API_KEY") ||
-    undefined
+    getSetting(runtime, "AI_GATEWAY_API_KEY")
   );
 }
 
@@ -33,8 +38,8 @@ export function getBaseURL(runtime: IAgentRuntime): string {
   return (
     getSetting(runtime, "AIGATEWAY_BASE_URL") ||
     getSetting(runtime, "AI_GATEWAY_BASE_URL") ||
-    "https://ai-gateway.vercel.sh/v1"
-  )!;
+    DEFAULT_BASE_URL
+  );
 }
 
 /**
@@ -44,8 +49,8 @@ export function getSmallModel(runtime: IAgentRuntime): string {
   return (
     getSetting(runtime, "AIGATEWAY_DEFAULT_MODEL") ||
     getSetting(runtime, "AI_GATEWAY_DEFAULT_MODEL") ||
-    "openai/gpt-4o-mini"
-  )!;
+    DEFAULT_SMALL_MODEL
+  );
 }
 
 /**
@@ -55,8 +60,8 @@ export function getLargeModel(runtime: IAgentRuntime): string {
   return (
     getSetting(runtime, "AIGATEWAY_LARGE_MODEL") ||
     getSetting(runtime, "AI_GATEWAY_LARGE_MODEL") ||
-    "openai/gpt-4o"
-  )!;
+    DEFAULT_LARGE_MODEL
+  );
 }
 
 /**
@@ -66,8 +71,19 @@ export function getEmbeddingModel(runtime: IAgentRuntime): string {
   return (
     getSetting(runtime, "AIGATEWAY_EMBEDDING_MODEL") ||
     getSetting(runtime, "AI_GATEWAY_EMBEDDING_MODEL") ||
-    "openai/text-embedding-3-small"
-  )!;
+    DEFAULT_EMBEDDING_MODEL
+  );
+}
+
+/**
+ * Get image model
+ */
+export function getImageModel(runtime: IAgentRuntime): string {
+  return (
+    getSetting(runtime, "AIGATEWAY_IMAGE_MODEL") ||
+    getSetting(runtime, "AI_GATEWAY_IMAGE_MODEL") ||
+    DEFAULT_IMAGE_MODEL
+  );
 }
 
 /**
@@ -155,6 +171,7 @@ export function getConfig(runtime: IAgentRuntime) {
     defaultModel: getSmallModel(runtime),
     largeModel: getLargeModel(runtime),
     embeddingModel: getEmbeddingModel(runtime),
+    imageModel: getImageModel(runtime),
     maxRetries: getMaxRetries(runtime),
     cacheTTL: getCacheTTL(runtime),
     useOIDC: useOIDC(runtime),

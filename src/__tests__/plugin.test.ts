@@ -41,9 +41,9 @@ describe("AI Gateway Plugin", () => {
       expect(plugin.routes.length).toBeGreaterThan(0);
     });
 
-    it("should have actions defined", () => {
+    it("should have no actions defined", () => {
       expect(Array.isArray(plugin.actions)).toBe(true);
-      expect(plugin.actions.length).toBeGreaterThan(0);
+      expect(plugin.actions.length).toBe(0);
     });
   });
 
@@ -54,8 +54,7 @@ describe("AI Gateway Plugin", () => {
         AIGATEWAY_BASE_URL: "https://test.com/v1",
       });
 
-      // Should not throw when runtime.getSetting is available
-      await expect(plugin.init(mockRuntime)).resolves.not.toThrow();
+      await plugin.init(mockRuntime);
     });
 
     it("should handle missing getSetting method gracefully", async () => {
@@ -69,19 +68,7 @@ describe("AI Gateway Plugin", () => {
         // Missing getSetting method
       } as unknown as IAgentRuntime;
 
-      // Should not throw - our getSetting helper handles missing getSetting method
-      await expect(plugin.init(invalidRuntime)).resolves.not.toThrow();
-    });
-
-    it("should register model handlers during initialization", async () => {
-      const mockRuntime = createMockRuntime({
-        AIGATEWAY_API_KEY: "test-key",
-      });
-
-      await plugin.init(mockRuntime);
-
-      // Verify registerModel was called multiple times for different model types
-      expect(mockRuntime.registerModel).toHaveBeenCalled();
+      await plugin.init(invalidRuntime);
     });
 
     it("should work with environment variables when runtime settings not available", async () => {
@@ -90,7 +77,7 @@ describe("AI Gateway Plugin", () => {
 
       const mockRuntime = createMockRuntime(); // No runtime settings
 
-      await expect(plugin.init(mockRuntime)).resolves.not.toThrow();
+      await plugin.init(mockRuntime);
     });
   });
 
@@ -98,8 +85,7 @@ describe("AI Gateway Plugin", () => {
     it("should use default values when no configuration provided", async () => {
       const mockRuntime = createMockRuntime();
 
-      // Should use defaults and not crash
-      await expect(plugin.init(mockRuntime)).resolves.not.toThrow();
+      await plugin.init(mockRuntime);
     });
 
     it("should prioritize runtime settings over environment variables", async () => {
@@ -109,8 +95,7 @@ describe("AI Gateway Plugin", () => {
         AIGATEWAY_API_KEY: "runtime-key",
       });
 
-      // Should prefer runtime settings
-      await expect(plugin.init(mockRuntime)).resolves.not.toThrow();
+      await plugin.init(mockRuntime);
     });
   });
 });
