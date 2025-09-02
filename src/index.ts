@@ -25,9 +25,6 @@ const plugin: Plugin = {
   providers: [],
   routes: [...openaiRoutes, ...socketIOStreamingRoutes, ...centralCompatRoutes, ...healthRoutes],
   models: {
-    [ModelType.TEXT]: async (runtime: IAgentRuntime, params: any) => {
-      
-    }
     [ModelType.TEXT_SMALL]: async (
       runtime: IAgentRuntime,
       params: GenerateTextParams,
@@ -64,46 +61,25 @@ const plugin: Plugin = {
       runtime: IAgentRuntime,
       params: ObjectGenerationParams,
     ) => {
-=======
-    [ModelType.TEXT_SMALL]: async (runtime: IAgentRuntime, params: any) => {
-      const provider = new GatewayProvider(runtime);
-      return provider.generateTextSmall(params);
-    },
-    [ModelType.TEXT_LARGE]: async (runtime: IAgentRuntime, params: any) => {
-      const provider = new GatewayProvider(runtime);
-      return provider.generateTextLarge(params);
-    },
-    [ModelType.TEXT_EMBEDDING]: async (runtime: IAgentRuntime, params: any) => {
-      const provider = new GatewayProvider(runtime);
-      return provider.generateEmbedding(params);
-    },
-    [ModelType.IMAGE]: async (runtime: IAgentRuntime, params: { prompt: string; count?: number; size?: string; }) => {
-      const provider = new GatewayProvider(runtime);
-      return provider.generateImage(params);
-    },
-    [ModelType.OBJECT_SMALL]: async (runtime: IAgentRuntime, params: any) => {
-      const provider = new GatewayProvider(runtime);
-      return provider.generateObjectSmall(params);
-    },
-    [ModelType.OBJECT_LARGE]: async (runtime: IAgentRuntime, params: any) => {
       const provider = new GatewayProvider(runtime);
       return provider.generateObjectLarge(params);
     },
   },
   // Accept both usages at runtime: init(runtime) or init(config, runtime)
-  // Keep implementation simple and type-safe: no return value expected
   init: async (...args: any[]) => {
-    const runtime: IAgentRuntime = (args.length === 1
-      ? (args[0] as IAgentRuntime)
-      : (args[1] as IAgentRuntime)) as IAgentRuntime;
+    const runtime: IAgentRuntime = (
+      args.length === 1 ? args[0] : args[1]
+    ) as IAgentRuntime;
 
     logger.info("[AIGateway] Plugin initialized with models export structure");
-  },
 
-    // Registration with runtime (if any) is best-effort and optional.
-    // We avoid strict typing issues by not calling internal registration APIs here.
-    void runtime;
-  }
+    if (runtime && typeof runtime.registerModel === "function") {
+      for (const [modelType, handler] of Object.entries(plugin.models ?? {})) {
+        runtime.registerModel(modelType as ModelType, "aigateway", handler);
+      }
+      logger.info("[AIGateway] All model handlers registered.");
+    }
+  },
 };
 
 export default plugin;

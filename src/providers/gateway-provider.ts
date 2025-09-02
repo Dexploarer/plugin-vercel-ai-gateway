@@ -1,4 +1,4 @@
-import { generateText, generateObject as aiGenerateObject, embed } from "ai";
+import { generateText, embed } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import {
   IAgentRuntime,
@@ -11,10 +11,6 @@ import {
 } from "@elizaos/core";
 import pRetry from "p-retry";
 import { CacheService } from "../utils/cache";
-import {
-  EventType,
-  ModelType,
-} from "@elizaos/core";
 import {
   getApiKey,
   getBaseURL,
@@ -409,25 +405,12 @@ export class GatewayProvider {
       "[AIGateway] Object generation not yet fully implemented - falling back to text generation",
     );
     const textResult = await this.generateTextSmall(
-
       {
         prompt: params.prompt,
         temperature: params.temperature,
         maxTokens: 2048,
       },
       ModelType.OBJECT_SMALL,
-    );
-
-      Object.fromEntries(
-        Object.entries({
-          prompt: params.prompt,
-          temperature: params.temperature,
-          maxTokens: 2048,
-          stopSequences: params.stopSequences,
-          frequencyPenalty: params.frequencyPenalty,
-          presencePenalty: params.presencePenalty,
-        }).filter(([, v]) => v !== undefined),
-      ) as GenerateTextParams,
     );
 
     try {
@@ -463,18 +446,6 @@ export class GatewayProvider {
         maxTokens: 4096,
       },
       ModelType.OBJECT_LARGE,
-    );
-
-      Object.fromEntries(
-        Object.entries({
-          prompt: params.prompt,
-          temperature: params.temperature,
-          maxTokens: 4096,
-          stopSequences: params.stopSequences,
-          frequencyPenalty: params.frequencyPenalty,
-          presencePenalty: params.presencePenalty,
-        }).filter(([, v]) => v !== undefined),
-      ) as GenerateTextParams,
     );
     try {
       const result = JSON.parse(textResult);
