@@ -149,12 +149,13 @@ async function executeToolCall(
 
   const actionName = functionMappings[func.name] || func.name;
 
+  const lname = actionName.toLowerCase();
   const action = runtime.actions.find(
     (a) =>
-      a.name.toLowerCase().includes(actionName.toLowerCase()) ||
-      a.similes?.some((s) => s.toLowerCase().includes(actionName.toLowerCase())),
+-      a.name.toLowerCase().includes(actionName.toLowerCase()) ||
+      a.name.toLowerCase() === lname ||
+      a.similes?.some((s) => s.toLowerCase() === lname),
   );
-
   if (!action) {
     throw new Error(`No action found for function: ${func.name}`);
   }
