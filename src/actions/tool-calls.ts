@@ -157,11 +157,19 @@ async function executeToolCall(
 
   let args = {};
   try {
-    args = JSON.parse(func.arguments);
+    args = typeof func.arguments === 'string' ? JSON.parse(func.arguments) : func.arguments;
   } catch (error) {
     logger.warn(
       `[AIGateway] Failed to parse tool call arguments: ${func.arguments}`,
     );
+    // Try to extract key-value pairs from string if it's not valid JSON
+    if (typeof func.arguments === 'string') {
+      args = func.arguments.split(',').reduce((obj, pair) => {
+        const [key, value] = pair.split(':').map(s => s.trim());
+        if (key) obj[key] = value || true;
+        return obj;
+      }, {});
+    }
   }
 
   const mockMessage: Memory = {
