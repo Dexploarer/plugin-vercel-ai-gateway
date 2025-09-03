@@ -174,13 +174,20 @@ async function executeToolCall(
     );
     // Try to extract key-value pairs from string if it's not valid JSON
     if (typeof func.arguments === 'string') {
-      args = func.arguments.split(',').reduce((obj, pair) => {
-        const [key, value] = pair.split(':').map(s => s.trim());
-        if (key) obj[key] = value || true;
-        return obj;
-      }, {});
+      try {
+        // Try a more lenient parsing approach
+        const cleanedArgs = func.arguments.replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":');
+        args = JSON.parse(`{${cleanedArgs}}`);
+      } catch (e) {
+        // Fall back to simple splitting as last resort
+        args = func.arguments.split(',').reduce((obj, pair) => {
+          const [key, value] = pair.split(':').map(s => s.trim());
+          if (key) obj[key] = value || true;
+          return obj;
+        }, {});
+        logger.warn(`[AIGateway] Using simplified argument parsing for: ${func.arguments}`);
+      }
     }
-  }
 
   const mockMessage: Memory = {
     id: `tool_call_${toolCall.id}`,
