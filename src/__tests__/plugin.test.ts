@@ -78,7 +78,7 @@ describe("AI Gateway Plugin", () => {
         AIGATEWAY_API_KEY: "test-key",
       });
 
-      plugin.init(mockRuntime);
+      await plugin.init(mockRuntime);
 
       // Verify registerModel was called multiple times for different model types
       expect(mockRuntime.registerModel).toHaveBeenCalled();
