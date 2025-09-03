@@ -31,7 +31,12 @@ export const toolCallsAction: Action = {
   validate: async (runtime: IAgentRuntime, message: Memory, state?: State) => {
     // Run when explicit tool calls are present
     if (Array.isArray(message.content?.tool_calls) && message.content.tool_calls.length > 0) {
-      return true;
+      // Validate that at least one tool call has the required structure
+      const hasValidToolCall = message.content.tool_calls.some(call => 
+        call && typeof call === 'object' && call.id && 
+        (call.type === 'function' && call.function && typeof call.function.name === 'string')
+      );
+      return hasValidToolCall;
     }
     const messageText = message.content?.text?.toLowerCase() || "";
     const toolPatterns = [
