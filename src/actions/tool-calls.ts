@@ -29,6 +29,10 @@ export const toolCallsAction: Action = {
     ],
   ],
   validate: async (runtime: IAgentRuntime, message: Memory, state?: State) => {
+    // Run when explicit tool calls are present
+    if (Array.isArray(message.content?.tool_calls) && message.content.tool_calls.length > 0) {
+      return true;
+    }
     const messageText = message.content?.text?.toLowerCase() || "";
     const toolPatterns = [
       /weather/i,
